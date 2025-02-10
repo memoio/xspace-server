@@ -4,25 +4,28 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/memoio/xspace-server/docs"
+	"github.com/memoio/xspace-server/server/router"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/xspace-server/docs"
- 
-	"github.com/xspace-server/server/router"
 )
 
-func NewServer(port string) *http.Server {
+func NewServer(chain, port string) (*http.Server, error) {
 	gin.SetMode(gin.ReleaseMode)
-
 	r := gin.Default()
+	r.MaxMultipartMemory = 8 << 20 // 8 MiB
+
 	r.Use(router.Cors())
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "Welcome to DID Server",
+			"message": "Welcome to Xspace Server",
 		})
 	})
 
-	router.NewRouter(r)
+	err := router.NewRouter(chain, r.Group("/v1"))
+	if err != nil {
+		return nil, err
+	}
 
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -30,5 +33,5 @@ func NewServer(port string) *http.Server {
 	return &http.Server{
 		Addr:    ":" + port,
 		Handler: r,
-	}
+	}, nil
 }

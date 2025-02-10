@@ -1,9 +1,521 @@
 basePath: /
-host: localhost:8080
+definitions:
+  router.ListNFTRes:
+    properties:
+      nftInfos:
+        items:
+          $ref: '#/definitions/router.NFTInfo'
+        type: array
+    type: object
+  router.ListProjectsRes:
+    properties:
+      projects:
+        items:
+          $ref: '#/definitions/router.ProjectInfo'
+        type: array
+    type: object
+  router.MintRes:
+    properties:
+      tokenID:
+        type: integer
+    type: object
+  router.NFTInfo:
+    properties:
+      createTime:
+        type: string
+      tokenID:
+        type: integer
+      type:
+        type: integer
+    type: object
+  router.PointHistoryRes:
+    properties:
+      history:
+        items:
+          $ref: '#/definitions/router.PointInfo'
+        type: array
+    type: object
+  router.PointInfo:
+    properties:
+      actionName:
+        type: string
+      point:
+        type: integer
+      time:
+        type: string
+    type: object
+  router.PointInfoRes:
+    properties:
+      charging:
+        type: boolean
+      chargingCount:
+        type: integer
+      godataCount:
+        type: integer
+      godataSpace:
+        type: integer
+      points:
+        type: integer
+    type: object
+  router.ProjectInfo:
+    properties:
+      end:
+        type: string
+      name:
+        type: string
+      projectID:
+        type: integer
+      start:
+        type: string
+    type: object
+  router.RankInfo:
+    properties:
+      address:
+        type: string
+      points:
+        type: integer
+      rank:
+        type: integer
+      scores:
+        type: integer
+    type: object
+  router.RankRes:
+    properties:
+      rnakInfo:
+        items:
+          $ref: '#/definitions/router.RankInfo'
+        type: array
+    type: object
+  router.TweetNFTInfoRes:
+    properties:
+      images:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      postTime:
+        type: integer
+      tweet:
+        type: string
+    type: object
+host: xspace.docs.org
 info:
   contact: {}
-  description: This is a did server.
-  title: DID-Server API
+  description: This is the API document for xspace server.
+  title: Xspace-Server API
   version: "1.0"
-paths: {}
+paths:
+  /v1/challenge:
+    get:
+      consumes:
+      - application/json
+      description: Get the challenge message by address before you login
+      parameters:
+      - description: User's address (connect to xspace)
+        in: query
+        name: address
+        required: true
+        type: string
+      - description: The network ID which the user's wallet is connected to
+        in: query
+        name: chainid
+        required: true
+        type: string
+      - description: The frontend's domain
+        in: header
+        name: Origin
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: The challenge message
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - Login
+  /v1/login:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Use the signMessage method to sign the challenge message. After signing, call the login interface to complete the login.
+        If the login is successful, the Login API will return an Access Token and a Refresh Token. When accessing subsequent APIs, you need to add the Authorization field in the headers with the value "Bearer Your_Access_Token"
+      parameters:
+      - description: The challenge message
+        in: body
+        name: message
+        required: true
+        schema:
+          type: string
+      - description: The result after the user's private key signs the challenge message
+        in: body
+        name: signature
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: The access token and refresh token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - Login
+  /v1/nft/data/info:
+    get:
+      consumes:
+      - application/json
+      description: Get DataNFT content
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: DataNFT's id
+        in: query
+        name: tokenID
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: DataNFT binary content
+          schema:
+            type: file
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - NFT
+  /v1/nft/list:
+    get:
+      consumes:
+      - application/json
+      description: List all NFT information belonging to the user
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Pages
+        in: query
+        name: page
+        required: true
+        type: string
+      - description: The amount of data displayed on each page
+        in: query
+        name: size
+        required: true
+        type: string
+      - description: NFT type (1 for tweetNFT, 2 for dataNFT, tweetNFT and dataNFT
+          will be all listed by default)
+        in: query
+        name: type
+        type: string
+      - description: Order rules (date_asc for sorting by creation time from smallest
+          to largest, date_dsc for sorting by creation time from largest to smallest)
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.ListNFTRes'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - NFT
+  /v1/nft/mint:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Mint user's data into NFTs
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User's data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.MintRes'
+        "502":
+          description: Bad Gateway
+          schema: {}
+        "503":
+          description: Service Unavailable
+          schema: {}
+      tags:
+      - NFT
+  /v1/nft/tweet/info:
+    get:
+      consumes:
+      - application/json
+      description: Get TweetNFT content
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: TweetNFT's id
+        in: query
+        name: tokenID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.TweetNFTInfoRes'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - NFT
+  /v1/point/charge:
+    post:
+      consumes:
+      - application/json
+      description: Users can charge once every 6 hours
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.PointInfoRes'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - Point
+  /v1/point/history:
+    get:
+      consumes:
+      - application/json
+      description: Get the history of the point info by address
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Pages
+        in: query
+        name: page
+        required: true
+        type: string
+      - description: The amount of data displayed on each page
+        in: query
+        name: size
+        required: true
+        type: string
+      - description: Order rules (date_asc for sorting by creation time from smallest
+          to largest, date_dsc for sorting by creation time from largest to smallest)
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.PointHistoryRes'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - Point
+  /v1/project/list:
+    get:
+      consumes:
+      - application/json
+      description: List all projects with Xspace
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.ListProjectsRes'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - Rank
+  /v1/project/rank:
+    get:
+      consumes:
+      - application/json
+      description: Get the ranking of cooperative projects
+      parameters:
+      - description: cooperative project id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Pages
+        in: query
+        name: page
+        required: true
+        type: string
+      - description: The amount of data displayed on each page
+        in: query
+        name: size
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.RankRes'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - Rank
+  /v1/refer/bind:
+    post:
+      consumes:
+      - application/json
+      description: Bind the refer code when first log in
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Other user's refer code
+        in: body
+        name: code
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - Refer
+  /v1/refer/info:
+    get:
+      consumes:
+      - application/json
+      description: Get the user's refer code
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user's refer code
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - Refer
+  /v1/refresh:
+    post:
+      consumes:
+      - application/json
+      description: If the access token expires, you can call the refresh API to get
+        a new access token or log in again.
+      parameters:
+      - description: Bearer YOUR_FRESH_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: The access token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema: {}
+      tags:
+      - Login
+  /v1/user/info:
+    get:
+      consumes:
+      - application/json
+      description: Get the user basic info by address
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.PointInfoRes'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - User
 swagger: "2.0"

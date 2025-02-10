@@ -3,14 +3,19 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
+	"github.com/urfave/cli/v2"
 )
 
-var version = "0.0.1"
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Print the version number",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("did server version is " + version)
+var Version = "2.0.0"
+
+var BuildFlag string
+
+var VersionCmd = &cli.Command{
+	Name:    "version",
+	Usage:   "print version",
+	Aliases: []string{"V"},
+	Action: func(_ *cli.Context) error {
+		fmt.Println(Version + "+" + BuildFlag)
+		return nil
 	},
 }
