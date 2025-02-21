@@ -1,0 +1,109 @@
+package point
+
+import (
+	"time"
+
+	"github.com/memoio/xspace-server/database"
+	"golang.org/x/xerrors"
+)
+
+var defaultActions = map[int]ActionInfo{
+	1: ActionInfo{
+		ID:          1,
+		Name:        "Sigin",
+		Description: "Log in to xspace and sign in every day",
+		ResetTime:   24 * time.Hour,
+		Point:       5,
+	},
+	2: ActionInfo{
+		ID:          2,
+		Name:        "Charging",
+		Description: "Daily charging",
+		ResetTime:   5 * time.Hour,
+		Point:       3,
+	},
+	3: ActionInfo{
+		ID:          3,
+		Name:        "MintNFT",
+		Description: "Mint tweets into NFT",
+		ResetTime:   time.Duration(0),
+		Point:       15,
+	},
+
+	11: ActionInfo{
+		ID:          11,
+		Name:        "Invited",
+		Description: "Invited by other xspace's user",
+		ResetTime:   time.Duration(-1),
+		Point:       50,
+	},
+	12: ActionInfo{
+		ID:          12,
+		Name:        "Invite",
+		Description: "Invited a new user",
+		ResetTime:   time.Duration(0),
+		Point:       50,
+	},
+
+	101: ActionInfo{
+		ID:          101,
+		Name:        "FollowTwitter",
+		Description: "Follow MEMO's official account on Twitter",
+		ResetTime:   time.Duration(-1),
+		Point:       10,
+	},
+	102: ActionInfo{
+		ID:          102,
+		Name:        "FollowDiscord",
+		Description: "Follow MEMO's official account on Discord",
+		ResetTime:   time.Duration(-1),
+		Point:       10,
+	},
+	103: ActionInfo{
+		ID:          103,
+		Name:        "FollowTelegram",
+		Description: "Follow MEMO's official account on Telegram",
+		ResetTime:   time.Duration(-1),
+		Point:       10,
+	},
+}
+
+type ActionInfo struct {
+	ID          int
+	Name        string
+	Description string
+	ResetTime   time.Duration
+	Point       int64
+}
+
+type PointController struct {
+	Actions map[int]ActionInfo
+}
+
+func NewPointController() (*PointController, error) {
+	return &PointController{Actions: defaultActions}, nil
+}
+
+func (c *PointController) GetActionInfo(actionID int) (ActionInfo, error) {
+	actionInfo, ok := c.Actions[actionID]
+	if !ok {
+		return actionInfo, xerrors.Errorf("Unsupported action id: %d", actionID)
+	}
+
+	return actionInfo, nil
+}
+
+func (c *PointController) FinishAction(address string, actionID int) error {
+	actionInfo, err := c.GetActionInfo(actionID)
+	if err != nil {
+		return err
+	}
+
+	userInfo, err := database.GetUserInfo(address)
+	if err != nil {
+		return err
+	}
+
+	userInfo.Points += actionInfo.Point
+	return userInfo.UpdateUserInfo()
+}

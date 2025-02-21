@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +11,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func NewServer(chain, port string) (*http.Server, error) {
+func NewServer(ctx context.Context, chain, sk, port string) (*http.Server, error) {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
@@ -22,7 +23,7 @@ func NewServer(chain, port string) (*http.Server, error) {
 		})
 	})
 
-	err := router.NewRouter(chain, r.Group("/v1"))
+	err := router.NewRouter(ctx, chain, sk, r.Group("/v1"))
 	if err != nil {
 		return nil, err
 	}

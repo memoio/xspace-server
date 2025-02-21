@@ -159,6 +159,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/nft/data/mint": {
+            "post": {
+                "description": "Mint user's data into NFTs",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "NFT"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer YOUR_ACCESS_TOKEN",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "User's data",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.MintRes"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/v1/nft/list": {
             "get": {
                 "description": "List all NFT information belonging to the user",
@@ -210,57 +256,11 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListNFTRes"
+                            "$ref": "#/definitions/types.ListNFTRes"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
-                        "schema": {}
-                    }
-                }
-            }
-        },
-        "/v1/nft/mint": {
-            "post": {
-                "description": "Mint user's data into NFTs",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "NFT"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer YOUR_ACCESS_TOKEN",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "User's data",
-                        "name": "file",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/router.MintRes"
-                        }
-                    },
-                    "502": {
-                        "description": "Bad Gateway",
-                        "schema": {}
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
                         "schema": {}
                     }
                 }
@@ -298,11 +298,86 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.TweetNFTInfoRes"
+                            "$ref": "#/definitions/types.TweetNFTInfoRes"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/v1/nft/tweet/mint": {
+            "post": {
+                "description": "Mint user's tweets into NFTs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "NFT"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer YOUR_ACCESS_TOKEN",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "User's twtter/x name",
+                        "name": "name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "The timestamp when the user posted the tweet",
+                        "name": "postTime",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "The text of the tweet(including emoji)",
+                        "name": "tweet",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "The image url of the tweet",
+                        "name": "image",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.MintRes"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {}
                     }
                 }
@@ -333,7 +408,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.PointInfoRes"
+                            "$ref": "#/definitions/types.PointInfoRes"
                         }
                     },
                     "500": {
@@ -379,6 +454,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "The action id",
+                        "name": "actionID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Order rules (date_asc for sorting by creation time from smallest to largest, date_dsc for sorting by creation time from largest to smallest)",
                         "name": "order",
                         "in": "query"
@@ -388,7 +469,46 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.PointHistoryRes"
+                            "$ref": "#/definitions/types.PointHistoryRes"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/v1/point/info": {
+            "get": {
+                "description": "Get the user's point info by address",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer YOUR_ACCESS_TOKEN",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PointInfoRes"
                         }
                     },
                     "500": {
@@ -414,7 +534,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.ListProjectsRes"
+                            "$ref": "#/definitions/types.ListProjectsRes"
                         }
                     },
                     "500": {
@@ -463,86 +583,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.RankRes"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {}
-                    }
-                }
-            }
-        },
-        "/v1/refer/bind": {
-            "post": {
-                "description": "Bind the refer code when first log in",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Refer"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer YOUR_ACCESS_TOKEN",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "Other user's refer code",
-                        "name": "code",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {}
-                    }
-                }
-            }
-        },
-        "/v1/refer/info": {
-            "get": {
-                "description": "Get the user's refer code",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Refer"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bearer YOUR_ACCESS_TOKEN",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "user's refer code",
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/types.RankRes"
                         }
                     },
                     "500": {
@@ -615,7 +656,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.PointInfoRes"
+                            "$ref": "#/definitions/types.UserInfoRes"
                         }
                     },
                     "500": {
@@ -627,29 +668,46 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "router.ListNFTRes": {
+        "database.ActionStore": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.ListNFTRes": {
             "type": "object",
             "properties": {
                 "nftInfos": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.NFTInfo"
+                        "$ref": "#/definitions/types.NFTInfo"
                     }
                 }
             }
         },
-        "router.ListProjectsRes": {
+        "types.ListProjectsRes": {
             "type": "object",
             "properties": {
                 "projects": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.ProjectInfo"
+                        "$ref": "#/definitions/types.ProjectInfo"
                     }
                 }
             }
         },
-        "router.MintRes": {
+        "types.MintRes": {
             "type": "object",
             "properties": {
                 "tokenID": {
@@ -657,7 +715,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.NFTInfo": {
+        "types.NFTInfo": {
             "type": "object",
             "properties": {
                 "createTime": {
@@ -671,32 +729,18 @@ const docTemplate = `{
                 }
             }
         },
-        "router.PointHistoryRes": {
+        "types.PointHistoryRes": {
             "type": "object",
             "properties": {
                 "history": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.PointInfo"
+                        "$ref": "#/definitions/database.ActionStore"
                     }
                 }
             }
         },
-        "router.PointInfo": {
-            "type": "object",
-            "properties": {
-                "actionName": {
-                    "type": "string"
-                },
-                "point": {
-                    "type": "integer"
-                },
-                "time": {
-                    "type": "string"
-                }
-            }
-        },
-        "router.PointInfoRes": {
+        "types.PointInfoRes": {
             "type": "object",
             "properties": {
                 "charging": {
@@ -716,7 +760,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.ProjectInfo": {
+        "types.ProjectInfo": {
             "type": "object",
             "properties": {
                 "end": {
@@ -733,7 +777,7 @@ const docTemplate = `{
                 }
             }
         },
-        "router.RankInfo": {
+        "types.RankInfo": {
             "type": "object",
             "properties": {
                 "address": {
@@ -750,18 +794,18 @@ const docTemplate = `{
                 }
             }
         },
-        "router.RankRes": {
+        "types.RankRes": {
             "type": "object",
             "properties": {
                 "rnakInfo": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/router.RankInfo"
+                        "$ref": "#/definitions/types.RankInfo"
                     }
                 }
             }
         },
-        "router.TweetNFTInfoRes": {
+        "types.TweetNFTInfoRes": {
             "type": "object",
             "properties": {
                 "images": {
@@ -780,6 +824,26 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "types.UserInfoRes": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "inviteCode": {
+                    "type": "string"
+                },
+                "points": {
+                    "type": "integer"
+                },
+                "referrals": {
+                    "type": "integer"
+                },
+                "space": {
+                    "type": "integer"
+                }
+            }
         }
     }
 }`
@@ -787,7 +851,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "xspace.docs.org",
+	Host:             "https://test-xs-api.memolabs.net",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Xspace-Server API",

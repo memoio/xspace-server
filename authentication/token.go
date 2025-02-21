@@ -86,7 +86,7 @@ func verifyJsonWebToken(tokenString string, jwtType int) (*Claims, error) {
 func genJsonWebTokenWithFlag(subject string, chainID, jwtType int, isRegistered bool) (string, error) {
 	var expireTime int64
 	if jwtType == AccessToken {
-		expireTime = time.Now().Add(2 * time.Hour).Unix()
+		expireTime = time.Now().Add(24 * time.Hour).Unix()
 	} else if jwtType == RefreshToken {
 		expireTime = time.Now().Add(7 * 24 * time.Hour).Unix()
 	} else {

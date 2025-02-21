@@ -1,10 +1,13 @@
-package router
+package types
 
-import "time"
+import (
+	"time"
+
+	"github.com/memoio/xspace-server/database"
+)
 
 // NFT types
 type MintTweetReq struct {
-	Address  string
 	Name     string
 	PostTime int64
 	Tweet    string
@@ -12,7 +15,7 @@ type MintTweetReq struct {
 }
 
 type MintRes struct {
-	TokenID int64
+	TokenID uint64
 }
 
 type ListNFTRes struct {
@@ -25,11 +28,21 @@ type NFTInfo struct {
 	CreateTime time.Time
 }
 
-type TweetNFTInfoRes struct {
+type TweetNFTInfo struct {
 	Name     string
 	PostTime int64
 	Tweet    string
 	Images   []string
+}
+
+type TweetNFTInfoRes TweetNFTInfo
+
+type UserInfoRes struct {
+	Address    string
+	InviteCode string
+	Points     int64
+	Referrals  int
+	Space      int
 }
 
 // point types
@@ -41,14 +54,8 @@ type PointInfoRes struct {
 	Charging      bool
 }
 
-type PointInfo struct {
-	Point      int64
-	Time       time.Time
-	ActionName string
-}
-
 type PointHistoryRes struct {
-	History []PointInfo
+	History []database.ActionStore
 }
 
 type ProjectInfo struct {

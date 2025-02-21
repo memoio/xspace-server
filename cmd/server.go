@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/memoio/xspace-server/database"
 	"github.com/memoio/xspace-server/server"
 	"github.com/urfave/cli/v2"
 )
@@ -30,40 +31,32 @@ var xspaceServerRunCmd = &cli.Command{
 			Usage:   "input your port",
 			Value:   "7890",
 		},
-		// &cli.StringFlag{
-		// 	Name:  "sk",
-		// 	Usage: "input your private key",
-		// 	Value: "",
-		// },
+		&cli.StringFlag{
+			Name:  "sk",
+			Usage: "input your private key",
+			Value: "",
+		},
 		&cli.StringFlag{
 			Name:  "chain",
 			Usage: "input chain name, e.g.(dev)",
 			Value: "dev",
 		},
-		// &cli.StringFlag{
-		// 	Name:  "ip",
-		// 	Usage: "input meeda store node's ip address",
-		// 	Value: "http://183.240.197.189:38082",
-		// },
 	},
 	Action: func(ctx *cli.Context) error {
 		port := ctx.String("port")
-		// sk := ctx.String("sk")
+		sk := ctx.String("sk")
 		chain := ctx.String("chain")
 		// ip := ctx.String("ip")
-
-		// privateKey, err := crypto.HexToECDSA(sk)
-		// if err != nil {
-		// 	privateKey, err = crypto.GenerateKey()
-		// 	if err != nil {
-		// 		return err
-		// 	}
-		// }
 
 		cctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		srv, err := server.NewServer(chain, port)
+		err := database.InitDatabase("./")
+		if err != nil {
+			return err
+		}
+
+		srv, err := server.NewServer(cctx, chain, sk, port)
 		if err != nil {
 			log.Fatalf("new store node server: %s\n", err)
 		}

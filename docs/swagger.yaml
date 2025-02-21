@@ -1,25 +1,36 @@
 basePath: /
 definitions:
-  router.ListNFTRes:
+  database.ActionStore:
+    properties:
+      address:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      time:
+        type: string
+    type: object
+  types.ListNFTRes:
     properties:
       nftInfos:
         items:
-          $ref: '#/definitions/router.NFTInfo'
+          $ref: '#/definitions/types.NFTInfo'
         type: array
     type: object
-  router.ListProjectsRes:
+  types.ListProjectsRes:
     properties:
       projects:
         items:
-          $ref: '#/definitions/router.ProjectInfo'
+          $ref: '#/definitions/types.ProjectInfo'
         type: array
     type: object
-  router.MintRes:
+  types.MintRes:
     properties:
       tokenID:
         type: integer
     type: object
-  router.NFTInfo:
+  types.NFTInfo:
     properties:
       createTime:
         type: string
@@ -28,23 +39,14 @@ definitions:
       type:
         type: integer
     type: object
-  router.PointHistoryRes:
+  types.PointHistoryRes:
     properties:
       history:
         items:
-          $ref: '#/definitions/router.PointInfo'
+          $ref: '#/definitions/database.ActionStore'
         type: array
     type: object
-  router.PointInfo:
-    properties:
-      actionName:
-        type: string
-      point:
-        type: integer
-      time:
-        type: string
-    type: object
-  router.PointInfoRes:
+  types.PointInfoRes:
     properties:
       charging:
         type: boolean
@@ -57,7 +59,7 @@ definitions:
       points:
         type: integer
     type: object
-  router.ProjectInfo:
+  types.ProjectInfo:
     properties:
       end:
         type: string
@@ -68,7 +70,7 @@ definitions:
       start:
         type: string
     type: object
-  router.RankInfo:
+  types.RankInfo:
     properties:
       address:
         type: string
@@ -79,14 +81,14 @@ definitions:
       scores:
         type: integer
     type: object
-  router.RankRes:
+  types.RankRes:
     properties:
       rnakInfo:
         items:
-          $ref: '#/definitions/router.RankInfo'
+          $ref: '#/definitions/types.RankInfo'
         type: array
     type: object
-  router.TweetNFTInfoRes:
+  types.TweetNFTInfoRes:
     properties:
       images:
         items:
@@ -99,7 +101,20 @@ definitions:
       tweet:
         type: string
     type: object
-host: xspace.docs.org
+  types.UserInfoRes:
+    properties:
+      address:
+        type: string
+      inviteCode:
+        type: string
+      points:
+        type: integer
+      referrals:
+        type: integer
+      space:
+        type: integer
+    type: object
+host: https://test-xs-api.memolabs.net
 info:
   contact: {}
   description: This is the API document for xspace server.
@@ -204,6 +219,37 @@ paths:
           schema: {}
       tags:
       - NFT
+  /v1/nft/data/mint:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Mint user's data into NFTs
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User's data
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.MintRes'
+        "500":
+          description: Internal Server Error
+          schema: {}
+        "501":
+          description: Not Implemented
+          schema: {}
+      tags:
+      - NFT
   /v1/nft/list:
     get:
       consumes:
@@ -241,40 +287,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.ListNFTRes'
+            $ref: '#/definitions/types.ListNFTRes'
         "500":
           description: Internal Server Error
-          schema: {}
-      tags:
-      - NFT
-  /v1/nft/mint:
-    post:
-      consumes:
-      - multipart/form-data
-      description: Mint user's data into NFTs
-      parameters:
-      - description: Bearer YOUR_ACCESS_TOKEN
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: User's data
-        in: formData
-        name: file
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/router.MintRes'
-        "502":
-          description: Bad Gateway
-          schema: {}
-        "503":
-          description: Service Unavailable
           schema: {}
       tags:
       - NFT
@@ -300,9 +315,59 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.TweetNFTInfoRes'
+            $ref: '#/definitions/types.TweetNFTInfoRes'
         "500":
           description: Internal Server Error
+          schema: {}
+      tags:
+      - NFT
+  /v1/nft/tweet/mint:
+    post:
+      consumes:
+      - application/json
+      description: Mint user's tweets into NFTs
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User's twtter/x name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: The timestamp when the user posted the tweet
+        in: body
+        name: postTime
+        required: true
+        schema:
+          type: integer
+      - description: The text of the tweet(including emoji)
+        in: body
+        name: tweet
+        required: true
+        schema:
+          type: string
+      - description: The image url of the tweet
+        in: body
+        name: image
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.MintRes'
+        "500":
+          description: Internal Server Error
+          schema: {}
+        "501":
+          description: Not Implemented
           schema: {}
       tags:
       - NFT
@@ -323,7 +388,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.PointInfoRes'
+            $ref: '#/definitions/types.PointInfoRes'
         "500":
           description: Internal Server Error
           schema: {}
@@ -350,6 +415,10 @@ paths:
         name: size
         required: true
         type: string
+      - description: The action id
+        in: query
+        name: actionID
+        type: string
       - description: Order rules (date_asc for sorting by creation time from smallest
           to largest, date_dsc for sorting by creation time from largest to smallest)
         in: query
@@ -361,12 +430,38 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.PointHistoryRes'
+            $ref: '#/definitions/types.PointHistoryRes'
+        "500":
+          description: Internal Server Error
+          schema: {}
+        "501":
+          description: Not Implemented
+          schema: {}
+      tags:
+      - Point
+  /v1/point/info:
+    get:
+      consumes:
+      - application/json
+      description: Get the user's point info by address
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.PointInfoRes'
         "500":
           description: Internal Server Error
           schema: {}
       tags:
-      - Point
+      - User
   /v1/project/list:
     get:
       consumes:
@@ -378,7 +473,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.ListProjectsRes'
+            $ref: '#/definitions/types.ListProjectsRes'
         "500":
           description: Internal Server Error
           schema: {}
@@ -411,64 +506,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.RankRes'
+            $ref: '#/definitions/types.RankRes'
         "500":
           description: Internal Server Error
           schema: {}
       tags:
       - Rank
-  /v1/refer/bind:
-    post:
-      consumes:
-      - application/json
-      description: Bind the refer code when first log in
-      parameters:
-      - description: Bearer YOUR_ACCESS_TOKEN
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      - description: Other user's refer code
-        in: body
-        name: code
-        required: true
-        schema:
-          type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema: {}
-      tags:
-      - Refer
-  /v1/refer/info:
-    get:
-      consumes:
-      - application/json
-      description: Get the user's refer code
-      parameters:
-      - description: Bearer YOUR_ACCESS_TOKEN
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: user's refer code
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema: {}
-      tags:
-      - Refer
   /v1/refresh:
     post:
       consumes:
@@ -512,7 +555,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.PointInfoRes'
+            $ref: '#/definitions/types.UserInfoRes'
         "500":
           description: Internal Server Error
           schema: {}
