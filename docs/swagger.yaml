@@ -114,7 +114,7 @@ definitions:
       space:
         type: integer
     type: object
-host: https://test-xs-api.memolabs.net
+host: test-xs-api.memolabs.net
 info:
   contact: {}
   description: This is the API document for xspace server.

@@ -851,7 +851,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "https://test-xs-api.memolabs.net",
+	Host:             "test-xs-api.memolabs.net",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Xspace-Server API",

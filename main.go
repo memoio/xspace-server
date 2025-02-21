@@ -11,7 +11,7 @@ import (
 // @title			Xspace-Server API
 // @version		1.0
 // @description	This is the API document for xspace server.
-// @Host			https://test-xs-api.memolabs.net
+// @Host			test-xs-api.memolabs.net
 // @BasePath		/
 func main() {
 	local := make([]*cli.Command, 0, 1)

@@ -70,11 +70,6 @@ func (c *AuthController) Challenge(domain, address, uri string, chainID int) (st
 		"chainId":   chainID,
 		"statement": purposeStatement,
 	}
-	fmt.Println(domain)
-	fmt.Println(address)
-	fmt.Println(uri)
-	fmt.Println(c.GetNonce())
-	fmt.Println(opt["chainId"])
 	msg, err := siwe.InitMessage(domain, address, uri, c.GetNonce(), opt)
 	if err != nil {
 		return "", err

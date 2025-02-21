@@ -120,7 +120,12 @@ func (h *handler) pointHistory(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, types.PointHistoryRes{History: actions})
+	c.JSON(200, types.PointHistoryRes{History: append(actions, database.ActionStore{
+		Id:      1,
+		Name:    "Charging",
+		Address: address,
+		Time:    time.Now().Add(-4 * time.Hour),
+	})})
 }
 
 // @ Summary ListProjects

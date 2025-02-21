@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "https://test-xs-api.memolabs.net",
+    "host": "test-xs-api.memolabs.net",
     "basePath": "/",
     "paths": {
         "/v1/challenge": {
