@@ -72,7 +72,7 @@ func (h *handler) charge(c *gin.Context) {
 //	@Param			page			query		string	true	"Pages"
 //	@Param			size			query		string	true	"The amount of data displayed on each page"
 //	@Param			actionID		query		string	false	"The action id"
-//	@Param			order			query		string	false	"Order rules (date_asc for sorting by creation time from smallest to largest, date_dsc for sorting by creation time from largest to smallest)"
+//	@Param			order			query		string	false	"Order rules (date_asc for sorting by creation time from smallest to largest, date_desc for sorting by creation time from largest to smallest)"
 //	@Success		200				{object}	types.PointHistoryRes
 //	@Router			/v1/point/history [get]
 //	@Failure		500	{object}	error
@@ -85,7 +85,7 @@ func (h *handler) pointHistory(c *gin.Context) {
 	order := c.Query("order")
 
 	if order == "" {
-		order = "date_dsc"
+		order = "date_desc"
 	}
 
 	if actionIdStr == "" {

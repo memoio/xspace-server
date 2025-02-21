@@ -51,7 +51,7 @@ func ListActionHistoryByID(address string, page, size int, order string, id int)
 	case "date_desc":
 		order = "time desc"
 	default:
-		return nil, xerrors.Errorf("not spport order rules: %d", order)
+		return nil, xerrors.Errorf("not spport order rules: %s", order)
 	}
 
 	if id == -1 {
