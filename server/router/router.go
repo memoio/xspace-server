@@ -2,9 +2,7 @@ package router
 
 import (
 	"context"
-	"encoding/hex"
 	"os"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-gonic/gin"
@@ -30,7 +28,7 @@ func NewRouter(ctx context.Context, chain string, sk string, r *gin.RouterGroup)
 
 	loggers := klog.NewHelper(logger)
 
-	authController, err := auth.NewAuthController(hex.EncodeToString([]byte(time.Now().String())))
+	authController, err := auth.NewAuthController(sk)
 	if err != nil {
 		return err
 	}

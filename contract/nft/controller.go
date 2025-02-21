@@ -49,7 +49,7 @@ type NFTController struct {
 }
 
 func NewNFTController(contractAddress common.Address, endpoint, sk string, logger *log.Helper) (*NFTController, error) {
-	store, err := gateway.NewDevGateway(logger)
+	store, err := gateway.NewGateway(logger)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
