@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/memoio/xspace-server/database"
 	"github.com/memoio/xspace-server/types"
+	"golang.org/x/xerrors"
 )
 
 func LoadPointModules(r *gin.RouterGroup, h *handler) {
@@ -29,9 +30,18 @@ func LoadPointModules(r *gin.RouterGroup, h *handler) {
 //	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
 //	@Success		200				{object}	types.UserInfoRes
 //	@Router			/v1/user/info [get]
-//	@Failure		500	{object}	error
+//	@Failure		520	{object}	error
 func (h *handler) userInfo(c *gin.Context) {
-	c.JSON(200, types.UserInfoRes{Address: "0x", InviteCode: "78ED", Points: 300, Referrals: 2, Space: 5})
+	address := c.GetString("address")
+
+	user, err := database.GetUserInfo(address)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	c.JSON(200, types.UserInfoRes{Address: user.Address, InviteCode: user.InviteCode, Points: user.Points, Referrals: user.Referrals, Space: user.Space})
 }
 
 // @ Summary UserInfo
@@ -43,9 +53,32 @@ func (h *handler) userInfo(c *gin.Context) {
 //	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
 //	@Success		200				{object}	types.PointInfoRes
 //	@Router			/v1/point/info [get]
-//	@Failure		500	{object}	error
+//	@Failure		520	{object}	error
 func (h *handler) pointInfo(c *gin.Context) {
-	c.JSON(200, types.PointInfoRes{Points: 3000, GodataCount: 5, GodataSpace: 97, ChargingCount: 2, Charging: true})
+	address := c.GetString("address")
+
+	user, err := database.GetUserInfo(address)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	godataCount, err := database.GetActionCount(address, 3)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	chargingCount, err := database.GetActionCount(address, 2)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	c.JSON(200, types.PointInfoRes{Points: user.Points, GodataCount: godataCount, GodataSpace: user.Space, ChargingCount: chargingCount})
 }
 
 // @ Summary Charge
@@ -55,11 +88,34 @@ func (h *handler) pointInfo(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
-//	@Success		200				{object}	types.PointInfoRes
+//	@Success		200				{object}	types.UserInfoRes
 //	@Router			/v1/point/charge [post]
-//	@Failure		500	{object}	error
+//	@Failure		403	{object}	error
 func (h *handler) charge(c *gin.Context) {
-	c.JSON(200, types.PointInfoRes{Points: 3000, GodataCount: 5, ChargingCount: 2})
+	address := c.GetString("address")
+
+	actions, err := database.ListActionHistoryByID(address, 1, 5, "date_desc", 2)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	if len(actions) >= 0 && actions[0].Time.Add(5*time.Hour).After(time.Now()) {
+		err = xerrors.Errorf("The last charge time is %s, please try again after %s", actions[0].Time.String(), actions[0].Time.Add(5*time.Hour).String())
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(403, err)
+		return
+	}
+
+	user, err := h.pointController.FinishAction(address, 2)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	c.JSON(200, types.UserInfoRes{Address: user.Address, InviteCode: user.InviteCode, Points: user.Points, Referrals: user.Referrals, Space: user.Space})
 }
 
 // @ Summary PointHistory
@@ -75,8 +131,8 @@ func (h *handler) charge(c *gin.Context) {
 //	@Param			order			query		string	false	"Order rules (date_asc for sorting by creation time from smallest to largest, date_desc for sorting by creation time from largest to smallest)"
 //	@Success		200				{object}	types.PointHistoryRes
 //	@Router			/v1/point/history [get]
-//	@Failure		500	{object}	error
-//	@Failure		501	{object}	error
+//	@Failure		400	{object}	error
+//	@Failure		520	{object}	error
 func (h *handler) pointHistory(c *gin.Context) {
 	address := c.GetString("address")
 	pageStr := c.Query("page")
@@ -95,28 +151,28 @@ func (h *handler) pointHistory(c *gin.Context) {
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(500, err)
+		c.AbortWithStatusJSON(400, err)
 		return
 	}
 
 	size, err := strconv.Atoi(sizeStr)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(500, err)
+		c.AbortWithStatusJSON(400, err)
 		return
 	}
 
 	actionId, err := strconv.Atoi(actionIdStr)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(500, err)
+		c.AbortWithStatusJSON(400, err)
 		return
 	}
 
 	actions, err := database.ListActionHistoryByID(address, page, size, order, actionId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(501, err)
+		c.AbortWithStatusJSON(520, err)
 		return
 	}
 
@@ -124,9 +180,14 @@ func (h *handler) pointHistory(c *gin.Context) {
 		Id:      1,
 		Name:    "Charging",
 		Address: address,
+		Point:   3,
 		Time:    time.Now().Add(-4 * time.Hour),
 	})})
 }
+
+// func (h *handler) invited(c *gin.Context) {
+
+// }
 
 // @ Summary ListProjects
 //

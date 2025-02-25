@@ -21,6 +21,7 @@ import (
 	"github.com/memoio/xspace-server/config"
 	"github.com/memoio/xspace-server/database"
 	"github.com/memoio/xspace-server/gateway"
+	"github.com/memoio/xspace-server/point"
 	"github.com/memoio/xspace-server/types"
 	"golang.org/x/xerrors"
 )
@@ -45,6 +46,7 @@ type NFTController struct {
 	endpoint        string
 	transactor      *bind.TransactOpts
 	store           gateway.IGateway
+	pointController *point.PointController
 	logger          *log.Helper
 }
 
@@ -172,7 +174,7 @@ func (c *NFTController) mintNFTTo(ctx context.Context, ntype NFTType, filename s
 		TokenId:    tokenId.Uint64(),
 		Address:    to.Hex(),
 		Cid:        info.Cid,
-		Type:       1,
+		Type:       string(ntype),
 		CreateTime: time.Now(),
 	}
 	err = nftStore.CreateNFTInfo()
@@ -180,7 +182,8 @@ func (c *NFTController) mintNFTTo(ctx context.Context, ntype NFTType, filename s
 		return tokenId.Uint64(), err
 	}
 
-	return tokenId.Uint64(), finishMint(to)
+	_, err = c.pointController.FinishAction(to.Hex(), 3)
+	return tokenId.Uint64(), err
 }
 
 func (c *NFTController) GetDataNFTContent(ctx context.Context, tokenId uint64) (gateway.ObjectInfo, io.Reader, error) {
@@ -306,16 +309,35 @@ func getStorageUnits(address common.Address) (int, error) {
 	return userInfo.Space, nil
 }
 
-func finishMint(address common.Address) error {
-	userInfo, err := database.GetUserInfo(address.Hex())
-	if err != nil {
-		return err
-	}
+// func finishMint(c *point.PointController, address common.Address) error {
+// 	userInfo, err := database.GetUserInfo(address.Hex())
+// 	if err != nil {
+// 		return err
+// 	}
 
-	if userInfo.Space == 0 {
-		return xerrors.New("The user's current storage units is 0")
-	}
+// 	if userInfo.Space == 0 {
+// 		return xerrors.New("The user's current storage units is 0")
+// 	}
 
-	userInfo.Space -= 1
-	return userInfo.UpdateUserInfo()
-}
+// 	actionInfo, err := c.GetActionInfo(3)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	userInfo.Space -= 1
+// 	userInfo.Points += actionInfo.Point
+// 	err = userInfo.UpdateUserInfo()
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	action := database.ActionStore{
+// 		Id:      actionInfo.ID,
+// 		Name:    actionInfo.Name,
+// 		Address: address.Hex(),
+// 		Point:   actionInfo.Point,
+// 		Time:    time.Now(),
+// 	}
+
+// 	return action.CreateActionInfo()
+// }

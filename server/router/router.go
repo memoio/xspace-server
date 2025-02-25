@@ -10,14 +10,16 @@ import (
 
 	auth "github.com/memoio/xspace-server/authentication"
 	"github.com/memoio/xspace-server/contract/nft"
+	"github.com/memoio/xspace-server/point"
 )
 
 type handler struct {
 	context context.Context
 	logger  *klog.Helper
 	// store
-	authController *auth.AuthController
-	nftController  *nft.NFTController
+	authController  *auth.AuthController
+	nftController   *nft.NFTController
+	pointController *point.PointController
 }
 
 func NewRouter(ctx context.Context, chain string, sk string, r *gin.RouterGroup) error {
@@ -30,6 +32,7 @@ func NewRouter(ctx context.Context, chain string, sk string, r *gin.RouterGroup)
 
 	authController, err := auth.NewAuthController(sk)
 	if err != nil {
+		loggers.Error(err)
 		return err
 	}
 
@@ -39,14 +42,22 @@ func NewRouter(ctx context.Context, chain string, sk string, r *gin.RouterGroup)
 		sk,
 		loggers)
 	if err != nil {
+		loggers.Error(err)
+		return err
+	}
+
+	pointController, err := point.NewPointController()
+	if err != nil {
+		loggers.Error(err)
 		return err
 	}
 
 	h := &handler{
-		context:        ctx,
-		nftController:  nftController,
-		authController: authController,
-		logger:         loggers,
+		context:         ctx,
+		nftController:   nftController,
+		authController:  authController,
+		pointController: pointController,
+		logger:          loggers,
 	}
 
 	LoadNFTModule(r.Group("/nft"), h)

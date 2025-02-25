@@ -93,17 +93,41 @@ func (c *PointController) GetActionInfo(actionID int) (ActionInfo, error) {
 	return actionInfo, nil
 }
 
-func (c *PointController) FinishAction(address string, actionID int) error {
+func (c *PointController) FinishAction(address string, actionID int) (database.UserStore, error) {
+	if actionID == 11 || actionID == 12 {
+		return database.UserStore{}, xerrors.New("not support refer action, please use FinishInvited function")
+	}
+
 	actionInfo, err := c.GetActionInfo(actionID)
 	if err != nil {
-		return err
+		return database.UserStore{}, err
 	}
 
 	userInfo, err := database.GetUserInfo(address)
 	if err != nil {
-		return err
+		return database.UserStore{}, err
 	}
 
 	userInfo.Points += actionInfo.Point
-	return userInfo.UpdateUserInfo()
+	if actionID == 3 {
+		if userInfo.Space == 0 {
+			return database.UserStore{}, xerrors.New("The user's current storage units is 0")
+		}
+		userInfo.Space -= 1
+	}
+
+	err = userInfo.UpdateUserInfo()
+	if err != nil {
+		return database.UserStore{}, err
+	}
+
+	action := database.ActionStore{
+		Id:      actionInfo.ID,
+		Name:    actionInfo.Name,
+		Address: address,
+		Point:   actionInfo.Point,
+		Time:    time.Now(),
+	}
+
+	return userInfo, action.CreateActionInfo()
 }

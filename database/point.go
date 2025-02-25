@@ -15,6 +15,7 @@ type ActionStore struct {
 	Id      int
 	Name    string
 	Address string
+	Point   int64
 	Time    time.Time
 }
 
@@ -22,19 +23,29 @@ func (action *ActionStore) CreateActionInfo() error {
 	return GlobalDataBase.Create(action).Error
 }
 
+func GetActionCount(address string, actionId int) (int64, error) {
+	var count int64
+	err := GlobalDataBase.Model(&ActionStore{}).Where("address = ? AND id = ?", address, actionId).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return count, err
+}
+
 func ListActionHistory(address string, page, size int, order string) ([]ActionStore, error) {
 	var actions []ActionStore
 	var orderRules string
 	switch order {
 	case "time_asc":
-		order = "time"
+		orderRules = "time"
 	case "time_desc":
-		order = "time desc"
+		orderRules = "time desc"
 	default:
-		return nil, xerrors.Errorf("not spport order rules: %d", order)
+		return nil, xerrors.Errorf("not spport order rules: %s", order)
 	}
 
-	err := GlobalDataBase.Model(&ActionStore{}).Where("address = ?", address).Order(orderRules).Find(&actions).Error
+	err := GlobalDataBase.Model(&ActionStore{}).Where("address = ?", address).Order(orderRules).Offset((page - 1) * size).Limit(size).Find(&actions).Error
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +71,7 @@ func ListActionHistoryByID(address string, page, size int, order string, id int)
 			return nil, err
 		}
 	} else {
-		err := GlobalDataBase.Model(&ActionStore{}).Where("address = ? and id = ?", address, id).Order(orderRules).Find(&actions).Error
+		err := GlobalDataBase.Model(&ActionStore{}).Where("address = ? and id = ?", address, id).Order(orderRules).Offset((page - 1) * size).Limit(size).Find(&actions).Error
 		if err != nil {
 			return nil, err
 		}

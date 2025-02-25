@@ -79,13 +79,13 @@ func CreateGateWay(api, token string, logger *log.Helper) (IGateway, error) {
 	}, nil
 }
 
-func NewDevGateway(logger *log.Helper) (IGateway, error) {
-	return &Mefs{
-		st:      MEFS,
-		addr:    "",
-		headers: http.Header{},
-	}, nil
-}
+// func NewDevGateway(logger *log.Helper) (IGateway, error) {
+// 	return &Mefs{
+// 		st:      MEFS,
+// 		addr:    "",
+// 		headers: http.Header{},
+// 	}, nil
+// }
 
 func (m *Mefs) GetStoreType(ctx context.Context) StorageType {
 	return m.st

@@ -1,11 +1,11 @@
 package router
 
 import (
-	"bytes"
-	"time"
+	"strconv"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-gonic/gin"
+	"github.com/memoio/xspace-server/database"
 	"github.com/memoio/xspace-server/types"
 )
 
@@ -30,8 +30,8 @@ func LoadNFTModule(r *gin.RouterGroup, h *handler) {
 //	@Param			image			body		string	true	"The image url of the tweet"
 //	@Success		200				{object}	types.MintRes
 //	@Router			/v1/nft/tweet/mint [post]
-//	@Failure		500	{object}	error
-//	@Failure		501	{object}	error
+//	@Failure		400	{object}	error
+//	@Failure		520	{object}	error
 func (h *handler) mintTweet(c *gin.Context) {
 	address := c.GetString("address")
 
@@ -39,14 +39,14 @@ func (h *handler) mintTweet(c *gin.Context) {
 	err := c.BindJSON(&req)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(500, err)
+		c.AbortWithError(400, err)
 		return
 	}
 
 	tokenId, err := h.nftController.MintTweetNFTTo(h.context, req.Name, req.PostTime, req.Tweet, req.Images, common.HexToAddress(address))
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(501, err)
+		c.AbortWithError(520, err)
 	}
 	c.JSON(200, types.MintRes{TokenID: tokenId})
 }
@@ -61,28 +61,28 @@ func (h *handler) mintTweet(c *gin.Context) {
 //	@Param			file			formData	file	true	"User's data"
 //	@Success		200				{object}	types.MintRes
 //	@Router			/v1/nft/data/mint [post]
-//	@Failure		500	{object}	error
-//	@Failure		501	{object}	error
+//	@Failure		400	{object}	error
+//	@Failure		520	{object}	error
 func (h *handler) mintData(c *gin.Context) {
 	address := c.GetString("address")
 	file, err := c.FormFile("file")
 	if err != nil {
 		h.logger.Error(err)
-		c.JSON(500, err)
+		c.JSON(400, err)
 		return
 	}
 
 	fr, err := file.Open()
 	if err != nil {
 		h.logger.Error(err)
-		c.JSON(500, err)
+		c.JSON(400, err)
 		return
 	}
 
 	tokenId, err := h.nftController.MintDataNFTTo(h.context, file.Filename, fr, common.HexToAddress(address))
 	if err != nil {
 		h.logger.Error(err)
-		c.JSON(501, err)
+		c.JSON(520, err)
 		return
 	}
 
@@ -98,13 +98,50 @@ func (h *handler) mintData(c *gin.Context) {
 //	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
 //	@Param			page			query		string	true	"Pages"
 //	@Param			size			query		string	true	"The amount of data displayed on each page"
-//	@Param			type			query		string	false	"NFT type (1 for tweetNFT, 2 for dataNFT, tweetNFT and dataNFT will be all listed by default)"
-//	@Param			order			query		string	false	"Order rules (date_asc for sorting by creation time from smallest to largest, date_dsc for sorting by creation time from largest to smallest)"
+//	@Param			type			query		string	false	"NFT type (tweet for tweetNFT, data for dataNFT, tweetNFT and dataNFT will be all listed by default)"
+//	@Param			order			query		string	false	"Order rules (date_asc for sorting by creation time from smallest to largest, date_desc for sorting by creation time from largest to smallest)"
 //	@Success		200				{object}	types.ListNFTRes
 //	@Router			/v1/nft/list [get]
-//	@Failure		500	{object}	error
+//	@Failure		400	{object}	error
+//	@Failure		520	{object}	error
 func (h *handler) listNFT(c *gin.Context) {
-	c.JSON(200, types.ListNFTRes{[]types.NFTInfo{types.NFTInfo{TokenID: 100, Type: 1, CreateTime: time.Now()}}})
+	address := c.GetString("address")
+	pageStr := c.Query("page")
+	sizeStr := c.Query("size")
+	ntype := c.Query("type")
+	order := c.Query("order")
+
+	if order == "" {
+		order = ""
+	}
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err)
+		return
+	}
+
+	size, err := strconv.Atoi(sizeStr)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err)
+		return
+	}
+
+	var nfts []database.NFTStore
+	if ntype == "" {
+		nfts, err = database.ListNFT(page, size, address, order)
+	} else {
+		nfts, err = database.ListNFTByType(page, size, address, order, ntype)
+	}
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	c.JSON(200, types.ListNFTRes{nfts})
 }
 
 // @ Summary TwitterNFTInfo
@@ -117,9 +154,47 @@ func (h *handler) listNFT(c *gin.Context) {
 //	@Param			tokenID			query		string	true	"TweetNFT's id"
 //	@Success		200				{object}	types.TweetNFTInfoRes
 //	@Router			/v1/nft/tweet/info [get]
-//	@Failure		500	{object}	error
+//	@Failure		400	{object}	error
+//	@Failure		403	{object}	error
+//	@Failure		520	{object}	error
 func (h *handler) twitterNFTInfo(c *gin.Context) {
-	c.JSON(200, types.TweetNFTInfoRes{Name: "test", PostTime: time.Now().Unix(), Tweet: "hello, twitter.😀", Images: []string{}})
+	address := c.GetString("address")
+	tokenIdStr := c.Query("tokenID")
+
+	tokenId, err := strconv.ParseUint(tokenIdStr, 10, 64)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err)
+		return
+	}
+
+	info, err := database.GetNFTInfo(tokenId)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	if info.Address != address {
+		h.logger.Error("You have no access to the tweet nft")
+		c.AbortWithStatusJSON(403, "You have no access to the tweet nft")
+		return
+	}
+
+	if info.Type != "tweet" {
+		h.logger.Error("This api only support tweet NFT, but got type: " + info.Type)
+		c.AbortWithStatusJSON(403, "This api only support tweet NFT, but got type: "+info.Type)
+		return
+	}
+
+	content, err := h.nftController.GetTweetNFTContent(h.context, tokenId)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	c.JSON(200, content)
 }
 
 // @ Summary DataNFTInfo
@@ -132,12 +207,48 @@ func (h *handler) twitterNFTInfo(c *gin.Context) {
 //	@Param			tokenID			query	string	true	"DataNFT's id"
 //	@Success		200				{file}	binary	"DataNFT binary content"
 //	@Router			/v1/nft/data/info [get]
-//	@Failure		500	{object}	error
+//	@Failure		400	{object}	error
+//	@Failure		403	{object}	error
+//	@Failure		520	{object}	error
 func (h *handler) dataNFTInfo(c *gin.Context) {
-	var w bytes.Buffer
-	w.WriteString("hello,world\n")
-	extraHeaders := map[string]string{
-		"Content-Disposition": "attachment; filename=\"test\"",
+	address := c.GetString("address")
+	tokenIdStr := c.Query("tokenID")
+
+	tokenId, err := strconv.ParseUint(tokenIdStr, 10, 64)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err)
+		return
 	}
-	c.DataFromReader(200, int64(w.Len()), "txt", &w, extraHeaders)
+
+	info, err := database.GetNFTInfo(tokenId)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	if info.Address != address {
+		h.logger.Error("You have no access to the data nft")
+		c.AbortWithStatusJSON(403, "You have no access to the data nft")
+		return
+	}
+
+	if info.Type != "data" {
+		h.logger.Error("This api only support data NFT, but got type: " + info.Type)
+		c.AbortWithStatusJSON(403, "This api only support data NFT, but got type: "+info.Type)
+		return
+	}
+
+	contentInfo, data, err := h.nftController.GetDataNFTContent(h.context, tokenId)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err)
+		return
+	}
+
+	extraHeaders := map[string]string{
+		"Content-Disposition": "attachment; filename=" + contentInfo.Name,
+	}
+	c.DataFromReader(200, contentInfo.Size, contentInfo.CType, data, extraHeaders)
 }

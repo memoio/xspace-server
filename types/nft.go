@@ -19,13 +19,7 @@ type MintRes struct {
 }
 
 type ListNFTRes struct {
-	NftInfos []NFTInfo
-}
-
-type NFTInfo struct {
-	TokenID    int64
-	Type       int
-	CreateTime time.Time
+	NftInfos []database.NFTStore
 }
 
 type TweetNFTInfo struct {
@@ -48,9 +42,9 @@ type UserInfoRes struct {
 // point types
 type PointInfoRes struct {
 	Points        int64
-	GodataCount   int
+	GodataCount   int64
 	GodataSpace   int
-	ChargingCount int
+	ChargingCount int64
 	Charging      bool
 }
 
