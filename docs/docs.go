@@ -152,8 +152,16 @@ const docTemplate = `{
                             "type": "file"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {}
+                    },
+                    "520": {
+                        "description": "",
                         "schema": {}
                     }
                 }
@@ -194,12 +202,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.MintRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {}
                     },
-                    "501": {
-                        "description": "Not Implemented",
+                    "520": {
+                        "description": "",
                         "schema": {}
                     }
                 }
@@ -241,13 +249,13 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "NFT type (1 for tweetNFT, 2 for dataNFT, tweetNFT and dataNFT will be all listed by default)",
+                        "description": "NFT type (tweet for tweetNFT, data for dataNFT, tweetNFT and dataNFT will be all listed by default)",
                         "name": "type",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Order rules (date_asc for sorting by creation time from smallest to largest, date_dsc for sorting by creation time from largest to smallest)",
+                        "description": "Order rules (date_asc for sorting by creation time from smallest to largest, date_desc for sorting by creation time from largest to smallest)",
                         "name": "order",
                         "in": "query"
                     }
@@ -259,8 +267,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.ListNFTRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "520": {
+                        "description": "",
                         "schema": {}
                     }
                 }
@@ -301,8 +313,16 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.TweetNFTInfoRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {}
+                    },
+                    "520": {
+                        "description": "",
                         "schema": {}
                     }
                 }
@@ -372,12 +392,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.MintRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {}
                     },
-                    "501": {
-                        "description": "Not Implemented",
+                    "520": {
+                        "description": "",
                         "schema": {}
                     }
                 }
@@ -408,11 +428,11 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/types.PointInfoRes"
+                            "$ref": "#/definitions/types.UserInfoRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {}
                     }
                 }
@@ -460,7 +480,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Order rules (date_asc for sorting by creation time from smallest to largest, date_dsc for sorting by creation time from largest to smallest)",
+                        "description": "Order rules (date_asc for sorting by creation time from smallest to largest, date_desc for sorting by creation time from largest to smallest)",
                         "name": "order",
                         "in": "query"
                     }
@@ -472,12 +492,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.PointHistoryRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {}
                     },
-                    "501": {
-                        "description": "Not Implemented",
+                    "520": {
+                        "description": "",
                         "schema": {}
                     }
                 }
@@ -511,8 +531,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.PointInfoRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "520": {
+                        "description": "",
                         "schema": {}
                     }
                 }
@@ -659,8 +679,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.UserInfoRes"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "520": {
+                        "description": "",
                         "schema": {}
                     }
                 }
@@ -680,7 +700,30 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "point": {
+                    "type": "integer"
+                },
                 "time": {
+                    "type": "string"
+                }
+            }
+        },
+        "database.NFTStore": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "cid": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "tokenId": {
+                    "type": "integer"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -691,7 +734,7 @@ const docTemplate = `{
                 "nftInfos": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/types.NFTInfo"
+                        "$ref": "#/definitions/database.NFTStore"
                     }
                 }
             }
@@ -711,20 +754,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "tokenID": {
-                    "type": "integer"
-                }
-            }
-        },
-        "types.NFTInfo": {
-            "type": "object",
-            "properties": {
-                "createTime": {
-                    "type": "string"
-                },
-                "tokenID": {
-                    "type": "integer"
-                },
-                "type": {
                     "type": "integer"
                 }
             }

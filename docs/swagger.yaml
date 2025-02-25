@@ -8,14 +8,29 @@ definitions:
         type: integer
       name:
         type: string
+      point:
+        type: integer
       time:
+        type: string
+    type: object
+  database.NFTStore:
+    properties:
+      address:
+        type: string
+      cid:
+        type: string
+      createTime:
+        type: string
+      tokenId:
+        type: integer
+      type:
         type: string
     type: object
   types.ListNFTRes:
     properties:
       nftInfos:
         items:
-          $ref: '#/definitions/types.NFTInfo'
+          $ref: '#/definitions/database.NFTStore'
         type: array
     type: object
   types.ListProjectsRes:
@@ -28,15 +43,6 @@ definitions:
   types.MintRes:
     properties:
       tokenID:
-        type: integer
-    type: object
-  types.NFTInfo:
-    properties:
-      createTime:
-        type: string
-      tokenID:
-        type: integer
-      type:
         type: integer
     type: object
   types.PointHistoryRes:
@@ -214,8 +220,14 @@ paths:
           description: DataNFT binary content
           schema:
             type: file
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          schema: {}
+        "403":
+          description: Forbidden
+          schema: {}
+        "520":
+          description: ""
           schema: {}
       tags:
       - NFT
@@ -242,11 +254,11 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.MintRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema: {}
-        "501":
-          description: Not Implemented
+        "520":
+          description: ""
           schema: {}
       tags:
       - NFT
@@ -271,13 +283,13 @@ paths:
         name: size
         required: true
         type: string
-      - description: NFT type (1 for tweetNFT, 2 for dataNFT, tweetNFT and dataNFT
-          will be all listed by default)
+      - description: NFT type (tweet for tweetNFT, data for dataNFT, tweetNFT and
+          dataNFT will be all listed by default)
         in: query
         name: type
         type: string
       - description: Order rules (date_asc for sorting by creation time from smallest
-          to largest, date_dsc for sorting by creation time from largest to smallest)
+          to largest, date_desc for sorting by creation time from largest to smallest)
         in: query
         name: order
         type: string
@@ -288,8 +300,11 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.ListNFTRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          schema: {}
+        "520":
+          description: ""
           schema: {}
       tags:
       - NFT
@@ -316,8 +331,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.TweetNFTInfoRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          schema: {}
+        "403":
+          description: Forbidden
+          schema: {}
+        "520":
+          description: ""
           schema: {}
       tags:
       - NFT
@@ -363,11 +384,11 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.MintRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema: {}
-        "501":
-          description: Not Implemented
+        "520":
+          description: ""
           schema: {}
       tags:
       - NFT
@@ -388,9 +409,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/types.PointInfoRes'
-        "500":
-          description: Internal Server Error
+            $ref: '#/definitions/types.UserInfoRes'
+        "403":
+          description: Forbidden
           schema: {}
       tags:
       - Point
@@ -420,7 +441,7 @@ paths:
         name: actionID
         type: string
       - description: Order rules (date_asc for sorting by creation time from smallest
-          to largest, date_dsc for sorting by creation time from largest to smallest)
+          to largest, date_desc for sorting by creation time from largest to smallest)
         in: query
         name: order
         type: string
@@ -431,11 +452,11 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.PointHistoryRes'
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema: {}
-        "501":
-          description: Not Implemented
+        "520":
+          description: ""
           schema: {}
       tags:
       - Point
@@ -457,8 +478,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.PointInfoRes'
-        "500":
-          description: Internal Server Error
+        "520":
+          description: ""
           schema: {}
       tags:
       - User
@@ -556,8 +577,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/types.UserInfoRes'
-        "500":
-          description: Internal Server Error
+        "520":
+          description: ""
           schema: {}
       tags:
       - User
