@@ -91,6 +91,7 @@ func (h *handler) pointInfo(c *gin.Context) {
 //	@Success		200				{object}	types.UserInfoRes
 //	@Router			/v1/point/charge [post]
 //	@Failure		403	{object}	error
+//	@Failure		520	{object}	error
 func (h *handler) charge(c *gin.Context) {
 	address := c.GetString("address")
 
@@ -101,11 +102,13 @@ func (h *handler) charge(c *gin.Context) {
 		return
 	}
 
-	if len(actions) >= 0 && actions[0].Time.Add(5*time.Hour).After(time.Now()) {
-		err = xerrors.Errorf("The last charge time is %s, please try again after %s", actions[0].Time.String(), actions[0].Time.Add(5*time.Hour).String())
-		h.logger.Error(err)
-		c.AbortWithStatusJSON(403, err)
-		return
+	if len(actions) >= 0 {
+		if actions[0].Time.Add(5 * time.Hour).After(time.Now()) {
+			err = xerrors.Errorf("The last charge time is %s, please try again after %s", actions[0].Time.String(), actions[0].Time.Add(5*time.Hour).String())
+			h.logger.Error(err)
+			c.AbortWithStatusJSON(403, err)
+			return
+		}
 	}
 
 	user, err := h.pointController.FinishAction(address, 2)

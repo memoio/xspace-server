@@ -27,7 +27,7 @@ func LoadNFTModule(r *gin.RouterGroup, h *handler) {
 //	@Param			name			body		string	true	"User's twtter/x name"
 //	@Param			postTime		body		int64	true	"The timestamp when the user posted the tweet"
 //	@Param			tweet			body		string	true	"The text of the tweet(including emoji)"
-//	@Param			image			body		string	true	"The image url of the tweet"
+//	@Param			images			body		string	true	"The image url of the tweet"
 //	@Success		200				{object}	types.MintRes
 //	@Router			/v1/nft/tweet/mint [post]
 //	@Failure		400	{object}	error
