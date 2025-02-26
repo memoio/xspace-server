@@ -37,7 +37,7 @@ func (h *handler) userInfo(c *gin.Context) {
 	user, err := database.GetUserInfo(address)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(520, err)
+		c.AbortWithStatusJSON(520, err.Error())
 		return
 	}
 
@@ -60,21 +60,21 @@ func (h *handler) pointInfo(c *gin.Context) {
 	user, err := database.GetUserInfo(address)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(520, err)
+		c.AbortWithStatusJSON(520, err.Error())
 		return
 	}
 
 	godataCount, err := database.GetActionCount(address, 3)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(520, err)
+		c.AbortWithStatusJSON(520, err.Error())
 		return
 	}
 
 	chargingCount, err := database.GetActionCount(address, 2)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(520, err)
+		c.AbortWithStatusJSON(520, err.Error())
 		return
 	}
 
@@ -94,22 +94,6 @@ func (h *handler) pointInfo(c *gin.Context) {
 //	@Failure		520	{object}	error
 func (h *handler) charge(c *gin.Context) {
 	address := c.GetString("address")
-
-	// actions, err := database.ListActionHistoryByID(address, 1, 5, "date_desc", 2)
-	// if err != nil {
-	// 	h.logger.Error(err)
-	// 	c.AbortWithError(520, err)
-	// 	return
-	// }
-
-	// if len(actions) > 0 {
-	// 	if actions[0].Time.Add(5 * time.Hour).After(time.Now()) {
-	// 		err = xerrors.Errorf("The last charge time is %s, please try again after %s", actions[0].Time.String(), actions[0].Time.Add(5*time.Hour).String())
-	// 		h.logger.Error(err)
-	// 		c.AbortWithError(403, err)
-	// 		return
-	// 	}
-	// }
 
 	user, err := h.pointController.FinishAction(address, 2)
 	if err != nil {
@@ -193,28 +177,28 @@ func (h *handler) pointHistory(c *gin.Context) {
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(400, err)
+		c.AbortWithStatusJSON(400, err.Error())
 		return
 	}
 
 	size, err := strconv.Atoi(sizeStr)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(400, err)
+		c.AbortWithStatusJSON(400, err.Error())
 		return
 	}
 
 	actionId, err := strconv.Atoi(actionIdStr)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(400, err)
+		c.AbortWithStatusJSON(400, err.Error())
 		return
 	}
 
 	actions, err := database.ListActionHistoryByID(address, page, size, order, actionId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(520, err)
+		c.AbortWithStatusJSON(520, err.Error())
 		return
 	}
 
