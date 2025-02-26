@@ -118,14 +118,14 @@ func (h *handler) listNFT(c *gin.Context) {
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(400, err)
+		c.AbortWithError(400, err)
 		return
 	}
 
 	size, err := strconv.Atoi(sizeStr)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(400, err)
+		c.AbortWithError(400, err)
 		return
 	}
 
@@ -137,7 +137,7 @@ func (h *handler) listNFT(c *gin.Context) {
 	}
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err)
+		c.AbortWithError(520, err)
 		return
 	}
 
@@ -164,14 +164,14 @@ func (h *handler) twitterNFTInfo(c *gin.Context) {
 	tokenId, err := strconv.ParseUint(tokenIdStr, 10, 64)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(400, err)
+		c.AbortWithError(400, err)
 		return
 	}
 
 	info, err := database.GetNFTInfo(tokenId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err)
+		c.AbortWithError(520, err)
 		return
 	}
 
@@ -190,7 +190,7 @@ func (h *handler) twitterNFTInfo(c *gin.Context) {
 	content, err := h.nftController.GetTweetNFTContent(h.context, tokenId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err)
+		c.AbortWithError(520, err)
 		return
 	}
 
@@ -217,14 +217,14 @@ func (h *handler) dataNFTInfo(c *gin.Context) {
 	tokenId, err := strconv.ParseUint(tokenIdStr, 10, 64)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(400, err)
+		c.AbortWithError(400, err)
 		return
 	}
 
 	info, err := database.GetNFTInfo(tokenId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err)
+		c.AbortWithError(520, err)
 		return
 	}
 
@@ -243,7 +243,7 @@ func (h *handler) dataNFTInfo(c *gin.Context) {
 	contentInfo, data, err := h.nftController.GetDataNFTContent(h.context, tokenId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err)
+		c.AbortWithError(520, err)
 		return
 	}
 

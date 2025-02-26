@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	auth "github.com/memoio/xspace-server/authentication"
+	"golang.org/x/xerrors"
 )
 
 func LoadAuthModule(g *gin.RouterGroup, h *handler) {
@@ -35,13 +36,13 @@ func LoadAuthModule(g *gin.RouterGroup, h *handler) {
 //	@Param			Origin	header		string	true	"The frontend's domain"
 //	@Success		200		{string}	string	"The challenge message"
 //	@Router			/v1/challenge [get]
-//	@Failure		500	{object}	error
+//	@Failure		400	{object}	error
 func (h *handler) ChallengeHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		address := c.Query("address")
 		uri, err := url.Parse(c.GetHeader("Origin"))
 		if err != nil {
-			c.JSON(500, err)
+			c.AbortWithError(400, err)
 			return
 		}
 		domain := uri.Host
@@ -50,7 +51,7 @@ func (h *handler) ChallengeHandler() gin.HandlerFunc {
 		if c.Query("chainid") != "" {
 			chainID, err = strconv.Atoi(c.Query("chainid"))
 			if err != nil {
-				c.JSON(500, err)
+				c.AbortWithError(400, err)
 				return
 			}
 		} else {
@@ -59,7 +60,7 @@ func (h *handler) ChallengeHandler() gin.HandlerFunc {
 
 		challenge, err := h.authController.Challenge(domain, address, uri.String(), chainID)
 		if err != nil {
-			c.JSON(500, err)
+			c.AbortWithError(400, err)
 			return
 		}
 		c.String(http.StatusOK, challenge)
@@ -77,19 +78,19 @@ func (h *handler) ChallengeHandler() gin.HandlerFunc {
 //	@Param			signature	body		string				true	"The result after the user's private key signs the challenge message"
 //	@Success		200			{object}	map[string]string	"The access token and refresh token"
 //	@Router			/v1/login [post]
-//	@Failure		500	{object}	error
+//	@Failure		400	{object}	error
 //	@Failure		401	{object}	error
 func (h *handler) LoginHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var request auth.EIP4361Request
 		err := c.BindJSON(&request)
 		if err != nil {
-			c.JSON(500, err)
+			c.AbortWithError(400, err)
 			return
 		}
 		accessToken, refreshToken, err := h.authController.Login(request)
 		if err != nil {
-			c.JSON(401, err)
+			c.AbortWithError(401, err)
 			return
 		}
 
@@ -115,7 +116,7 @@ func (h *handler) RefreshHandler() gin.HandlerFunc {
 		tokenString := c.GetHeader("Authorization")
 		accessToken, err := auth.VerifyRefreshToken(tokenString)
 		if err != nil {
-			c.String(http.StatusUnauthorized, "Illegal refresh token")
+			c.AbortWithError(http.StatusUnauthorized, xerrors.Errorf("Illegal refresh token: %s", err.Error()))
 			return
 		}
 
@@ -133,7 +134,7 @@ func (h *handler) VerifyIdentityHandler(c *gin.Context) {
 
 	address, chainid, err := auth.VerifyAccessToken(tokenString)
 	if err != nil {
-		c.AbortWithStatusJSON(401, err)
+		c.AbortWithError(401, err)
 		return
 	}
 
