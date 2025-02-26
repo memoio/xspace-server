@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/memoio/xspace-server/database"
 	"github.com/memoio/xspace-server/types"
-	"golang.org/x/xerrors"
 )
 
 func LoadPointModules(r *gin.RouterGroup, h *handler) {
@@ -96,21 +95,21 @@ func (h *handler) pointInfo(c *gin.Context) {
 func (h *handler) charge(c *gin.Context) {
 	address := c.GetString("address")
 
-	actions, err := database.ListActionHistoryByID(address, 1, 5, "date_desc", 2)
-	if err != nil {
-		h.logger.Error(err)
-		c.AbortWithError(520, err)
-		return
-	}
+	// actions, err := database.ListActionHistoryByID(address, 1, 5, "date_desc", 2)
+	// if err != nil {
+	// 	h.logger.Error(err)
+	// 	c.AbortWithError(520, err)
+	// 	return
+	// }
 
-	if len(actions) > 0 {
-		if actions[0].Time.Add(5 * time.Hour).After(time.Now()) {
-			err = xerrors.Errorf("The last charge time is %s, please try again after %s", actions[0].Time.String(), actions[0].Time.Add(5*time.Hour).String())
-			h.logger.Error(err)
-			c.AbortWithError(403, err)
-			return
-		}
-	}
+	// if len(actions) > 0 {
+	// 	if actions[0].Time.Add(5 * time.Hour).After(time.Now()) {
+	// 		err = xerrors.Errorf("The last charge time is %s, please try again after %s", actions[0].Time.String(), actions[0].Time.Add(5*time.Hour).String())
+	// 		h.logger.Error(err)
+	// 		c.AbortWithError(403, err)
+	// 		return
+	// 	}
+	// }
 
 	user, err := h.pointController.FinishAction(address, 2)
 	if err != nil {

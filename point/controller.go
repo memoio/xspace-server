@@ -103,6 +103,11 @@ func (c *PointController) FinishAction(address string, actionID int) (database.U
 		return database.UserStore{}, err
 	}
 
+	err = c.checkExpire(address, actionInfo)
+	if err != nil {
+		return database.UserStore{}, err
+	}
+
 	userInfo, err := database.GetUserInfo(address)
 	if err != nil {
 		return database.UserStore{}, err
@@ -130,4 +135,22 @@ func (c *PointController) FinishAction(address string, actionID int) (database.U
 	}
 
 	return userInfo, action.CreateActionInfo()
+}
+
+func (c *PointController) checkExpire(address string, actionInfo ActionInfo) error {
+	actions, err := database.ListActionHistoryByID(address, 1, 5, "date_desc", actionInfo.ID)
+	if err != nil {
+		return err
+	}
+
+	if len(actions) > 0 {
+		if actionInfo.ResetTime == -1 {
+			return xerrors.Errorf("%s is one-time action", actionInfo.Name)
+		}
+		if actions[0].Time.Add(actionInfo.ResetTime).After(time.Now()) {
+			return xerrors.Errorf("The last %s time is %s, please try again after %s", actionInfo.Name, actions[0].Time.String, actions[0].Time.Add(actionInfo.ResetTime))
+		}
+	}
+
+	return nil
 }
