@@ -112,7 +112,7 @@ func (h *handler) listNFT(c *gin.Context) {
 	order := c.Query("order")
 
 	if order == "" {
-		order = ""
+		order = "time_desc"
 	}
 
 	page, err := strconv.Atoi(pageStr)
