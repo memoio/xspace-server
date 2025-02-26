@@ -68,6 +68,10 @@ type ListProjectsRes struct {
 	Projects []ProjectInfo
 }
 
+type InviteReq struct {
+	Code string
+}
+
 type RankInfo struct {
 	Rank    int
 	Address string

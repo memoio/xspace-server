@@ -83,7 +83,7 @@ func ListActionHistoryByID(address string, page, size int, order string, id int)
 type UserStore struct {
 	Address     string `gorm:"primarykey"`
 	Points      int64
-	InviteCode  string `gorm:"uniqueIndex"`
+	InviteCode  string `gorm:"uniqueIndex,conlum:invitecode"`
 	InvitedCode string
 	Referrals   int
 	Space       int
@@ -119,6 +119,16 @@ func GetUserInfo(address string) (UserStore, error) {
 	}
 
 	return user, err
+}
+
+func GetUserInfoByCode(code string) (UserStore, error) {
+	var user UserStore
+	err := GlobalDataBase.Model(&UserStore{}).Where("invitecode = ?", code).Find(&user).Error
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }
 
 func createCode() string {

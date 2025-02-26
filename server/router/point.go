@@ -13,6 +13,7 @@ func LoadPointModules(r *gin.RouterGroup, h *handler) {
 	r.GET("/user/info", h.VerifyIdentityHandler, h.userInfo)
 
 	r.POST("/point/charge", h.VerifyIdentityHandler, h.charge)
+	r.POST("/point/invite", h.VerifyIdentityHandler, h.invite)
 	r.POST("/point/add", h.VerifyIdentityHandler, h.finishAction)
 	r.GET("/point/info", h.VerifyIdentityHandler, h.pointInfo)
 	r.GET("/point/history", h.VerifyIdentityHandler, h.pointHistory)
@@ -205,9 +206,79 @@ func (h *handler) pointHistory(c *gin.Context) {
 	c.JSON(200, types.PointHistoryRes{History: actions})
 }
 
-// func (h *handler) invited(c *gin.Context) {
+// @ Summary Invite
+//
+//	@Description	Get the history of the point info by address
+//	@Tags			Point
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
+//	@Param			code			body		string	true	"The invite code from other user"
+//	@Success		200				{object}	types.UserInfoRes
+//	@Router			/v1/point/invite [post]
+//	@Failure		400	{object}	error
+//	@Failure		520	{object}	error
+func (h *handler) invite(c *gin.Context) {
+	address := c.GetString("address")
 
-// }
+	var req types.InviteReq
+	err := c.BindJSON(&req)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err.Error())
+		return
+	}
+
+	if len(req.Code) != 6 {
+		h.logger.Error("The invitation code must be 6 characters long")
+		c.AbortWithStatusJSON(400, "The invitation code must be 6 characters long")
+		return
+	}
+
+	user1, err := database.GetUserInfo(address)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err.Error())
+		return
+	}
+
+	if user1.InviteCode == req.Code {
+		h.logger.Error("You can't invite yourself")
+		c.AbortWithStatusJSON(400, "You can't invite yourself")
+		return
+	}
+
+	user2, err := database.GetUserInfoByCode(req.Code)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err.Error())
+		return
+	}
+
+	_, err = h.pointController.FinishAction(user2.Address, 12)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err.Error())
+		return
+	}
+
+	user, err := h.pointController.FinishAction(user1.Address, 11)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err.Error())
+		return
+	}
+
+	user.InvitedCode = req.Code
+	err = user.UpdateUserInfo()
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err.Error())
+		return
+	}
+
+	c.JSON(200, types.UserInfoRes{Address: user.Address, InviteCode: user.InviteCode, InvitedCode: user.InvitedCode, Points: user.Points, Referrals: user.Referrals, Space: user.Space})
+}
 
 // @ Summary ListProjects
 //
