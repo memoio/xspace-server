@@ -157,17 +157,17 @@ func (c *NFTController) mintNFTTo(ctx context.Context, ntype NFTType, filename s
 
 	tokenId, err := nftIns.Id(&bind.CallOpts{})
 	if err != nil {
-		return tokenId.Uint64(), err
+		return 0, err
 	}
 
 	tx, err := nftIns.Mint(c.transactor, to, string(ntype)+`\`+info.Cid)
 	if err != nil {
-		return tokenId.Uint64(), err
+		return 0, err
 	}
 
 	err = c.checkTx(tx.Hash(), "mint")
 	if err != nil {
-		return tokenId.Uint64(), err
+		return 0, err
 	}
 
 	nftStore := &database.NFTStore{
