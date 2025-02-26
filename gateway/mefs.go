@@ -51,6 +51,7 @@ func NewGateway(logger *log.Helper) (IGateway, error) {
 		st:      MEFS,
 		addr:    addr,
 		headers: headers,
+		logger:  logger,
 	}, nil
 }
 
@@ -76,6 +77,7 @@ func CreateGateWay(api, token string, logger *log.Helper) (IGateway, error) {
 		st:      MEFS,
 		addr:    addr,
 		headers: headers,
+		logger:  logger,
 	}, nil
 }
 
