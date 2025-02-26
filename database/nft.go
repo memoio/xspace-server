@@ -30,9 +30,9 @@ func ListNFT(page, size int, address, order string) ([]NFTStore, error) {
 	var orderRules string
 	switch order {
 	case "time_asc":
-		orderRules = "time"
+		orderRules = "create"
 	case "time_desc":
-		orderRules = "time desc"
+		orderRules = "create desc"
 	default:
 		return nil, xerrors.Errorf("not spport order rules: %s", order)
 	}
@@ -50,9 +50,9 @@ func ListNFTByType(page, size int, address, order string, ntype string) ([]NFTSt
 	var orderRules string
 	switch order {
 	case "time_asc":
-		orderRules = "time"
+		orderRules = "create"
 	case "time_desc":
-		orderRules = "time desc"
+		orderRules = "create desc"
 	default:
 		return nil, xerrors.Errorf("not spport order rules: %s", order)
 	}
