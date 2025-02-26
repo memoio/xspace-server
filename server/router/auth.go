@@ -42,7 +42,8 @@ func (h *handler) ChallengeHandler() gin.HandlerFunc {
 		address := c.Query("address")
 		uri, err := url.Parse(c.GetHeader("Origin"))
 		if err != nil {
-			c.AbortWithError(400, err)
+			h.logger.Error(err)
+			c.AbortWithStatusJSON(400, err.Error())
 			return
 		}
 		domain := uri.Host
@@ -51,7 +52,8 @@ func (h *handler) ChallengeHandler() gin.HandlerFunc {
 		if c.Query("chainid") != "" {
 			chainID, err = strconv.Atoi(c.Query("chainid"))
 			if err != nil {
-				c.AbortWithError(400, err)
+				h.logger.Error(err)
+				c.AbortWithStatusJSON(400, err.Error())
 				return
 			}
 		} else {
@@ -60,7 +62,8 @@ func (h *handler) ChallengeHandler() gin.HandlerFunc {
 
 		challenge, err := h.authController.Challenge(domain, address, uri.String(), chainID)
 		if err != nil {
-			c.AbortWithError(400, err)
+			h.logger.Error(err)
+			c.AbortWithStatusJSON(400, err.Error())
 			return
 		}
 		c.String(http.StatusOK, challenge)
@@ -85,12 +88,14 @@ func (h *handler) LoginHandler() gin.HandlerFunc {
 		var request auth.EIP4361Request
 		err := c.BindJSON(&request)
 		if err != nil {
-			c.AbortWithError(400, err)
+			h.logger.Error(err)
+			c.AbortWithStatusJSON(400, err.Error())
 			return
 		}
 		accessToken, refreshToken, err := h.authController.Login(request)
 		if err != nil {
-			c.AbortWithError(401, err)
+			h.logger.Error(err)
+			c.AbortWithStatusJSON(401, err.Error())
 			return
 		}
 
@@ -116,7 +121,8 @@ func (h *handler) RefreshHandler() gin.HandlerFunc {
 		tokenString := c.GetHeader("Authorization")
 		accessToken, err := auth.VerifyRefreshToken(tokenString)
 		if err != nil {
-			c.AbortWithError(http.StatusUnauthorized, xerrors.Errorf("Illegal refresh token: %s", err.Error()))
+			h.logger.Error(err)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, xerrors.Errorf("Illegal refresh token: %s", err.Error()).Error())
 			return
 		}
 
@@ -134,7 +140,8 @@ func (h *handler) VerifyIdentityHandler(c *gin.Context) {
 
 	address, chainid, err := auth.VerifyAccessToken(tokenString)
 	if err != nil {
-		c.AbortWithError(401, err)
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(401, err.Error())
 		return
 	}
 
