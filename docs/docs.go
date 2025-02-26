@@ -57,8 +57,8 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {}
                     }
                 }
@@ -106,12 +106,12 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {}
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {}
                     }
                 }
@@ -377,7 +377,7 @@ const docTemplate = `{
                     },
                     {
                         "description": "The image url of the tweet",
-                        "name": "image",
+                        "name": "images",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -390,6 +390,54 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/types.MintRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "520": {
+                        "description": "",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/v1/point/add": {
+            "post": {
+                "description": "Users can earn point with finish action",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Point"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer YOUR_ACCESS_TOKEN",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "action id (101 for follow twitter, 102 for follow discord, 103 for follow telegram)",
+                        "name": "tokenId",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.UserInfoRes"
                         }
                     },
                     "400": {
@@ -433,6 +481,10 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Forbidden",
+                        "schema": {}
+                    },
+                    "520": {
+                        "description": "",
                         "schema": {}
                     }
                 }
@@ -861,6 +913,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "inviteCode": {
+                    "type": "string"
+                },
+                "invitedCode": {
                     "type": "string"
                 },
                 "points": {

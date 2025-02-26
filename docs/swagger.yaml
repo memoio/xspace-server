@@ -113,6 +113,8 @@ definitions:
         type: string
       inviteCode:
         type: string
+      invitedCode:
+        type: string
       points:
         type: integer
       referrals:
@@ -155,8 +157,8 @@ paths:
           description: The challenge message
           schema:
             type: string
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
           schema: {}
       tags:
       - Login
@@ -189,11 +191,11 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "400":
+          description: Bad Request
+          schema: {}
         "401":
           description: Unauthorized
-          schema: {}
-        "500":
-          description: Internal Server Error
           schema: {}
       tags:
       - Login
@@ -373,7 +375,7 @@ paths:
           type: string
       - description: The image url of the tweet
         in: body
-        name: image
+        name: images
         required: true
         schema:
           type: string
@@ -392,6 +394,39 @@ paths:
           schema: {}
       tags:
       - NFT
+  /v1/point/add:
+    post:
+      consumes:
+      - application/json
+      description: Users can earn point with finish action
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: action id (101 for follow twitter, 102 for follow discord, 103
+          for follow telegram)
+        in: body
+        name: tokenId
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.UserInfoRes'
+        "400":
+          description: Bad Request
+          schema: {}
+        "520":
+          description: ""
+          schema: {}
+      tags:
+      - Point
   /v1/point/charge:
     post:
       consumes:
@@ -412,6 +447,9 @@ paths:
             $ref: '#/definitions/types.UserInfoRes'
         "403":
           description: Forbidden
+          schema: {}
+        "520":
+          description: ""
           schema: {}
       tags:
       - Point

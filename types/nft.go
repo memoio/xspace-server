@@ -32,14 +32,19 @@ type TweetNFTInfo struct {
 type TweetNFTInfoRes TweetNFTInfo
 
 type UserInfoRes struct {
-	Address    string
-	InviteCode string
-	Points     int64
-	Referrals  int
-	Space      int
+	Address     string
+	InviteCode  string
+	InvitedCode string
+	Points      int64
+	Referrals   int
+	Space       int
 }
 
 // point types
+type FinishActionReq struct {
+	ActionId int
+}
+
 type PointInfoRes struct {
 	Points        int64
 	GodataCount   int64

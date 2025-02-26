@@ -14,6 +14,7 @@ func LoadPointModules(r *gin.RouterGroup, h *handler) {
 	r.GET("/user/info", h.VerifyIdentityHandler, h.userInfo)
 
 	r.POST("/point/charge", h.VerifyIdentityHandler, h.charge)
+	r.POST("/point/add", h.VerifyIdentityHandler, h.finishAction)
 	r.GET("/point/info", h.VerifyIdentityHandler, h.pointInfo)
 	r.GET("/point/history", h.VerifyIdentityHandler, h.pointHistory)
 
@@ -118,7 +119,46 @@ func (h *handler) charge(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, types.UserInfoRes{Address: user.Address, InviteCode: user.InviteCode, Points: user.Points, Referrals: user.Referrals, Space: user.Space})
+	c.JSON(200, types.UserInfoRes{Address: user.Address, InviteCode: user.InviteCode, InvitedCode: user.InvitedCode, Points: user.Points, Referrals: user.Referrals, Space: user.Space})
+}
+
+// @ Summary FinishAction
+//
+//	@Description	Users can earn point with finish action
+//	@Tags			Point
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
+//	@Param			tokenId			body		int		true	"action id (101 for follow twitter, 102 for follow discord, 103 for follow telegram)"
+//	@Success		200				{object}	types.UserInfoRes
+//	@Router			/v1/point/add [post]
+//	@Failure		400	{object}	error
+//	@Failure		520	{object}	error
+func (h *handler) finishAction(c *gin.Context) {
+	address := c.GetString("address")
+
+	var req types.FinishActionReq
+	err := c.BindJSON(&req)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err.Error())
+		return
+	}
+
+	if req.ActionId < 101 || req.ActionId > 103 {
+		h.logger.Error("This interface only support actionId from 101 to 103")
+		c.AbortWithStatusJSON(400, "This interface only support actionId from 101 to 103")
+		return
+	}
+
+	user, err := h.pointController.FinishAction(address, req.ActionId)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(520, err.Error())
+		return
+	}
+
+	c.JSON(200, types.UserInfoRes{Address: user.Address, InviteCode: user.InviteCode, InvitedCode: user.InvitedCode, Points: user.Points, Referrals: user.Referrals, Space: user.Space})
 }
 
 // @ Summary PointHistory
@@ -179,13 +219,7 @@ func (h *handler) pointHistory(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, types.PointHistoryRes{History: append(actions, database.ActionStore{
-		Id:      1,
-		Name:    "Charging",
-		Address: address,
-		Point:   3,
-		Time:    time.Now().Add(-4 * time.Hour),
-	})})
+	c.JSON(200, types.PointHistoryRes{History: actions})
 }
 
 // func (h *handler) invited(c *gin.Context) {
