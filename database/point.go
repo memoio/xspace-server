@@ -108,7 +108,7 @@ func GetUserInfo(address string) (UserStore, error) {
 		Space:       config.DefaultSpace,
 		UpdateTime:  time.Now(),
 	}
-	err := GlobalDataBase.Model(&UserStore{}).Where("address = ?", address).Find(&user).Error
+	err := GlobalDataBase.Model(&UserStore{}).Where("address = ?", address).First(&user).Error
 	if err != nil {
 		if !strings.Contains(err.Error(), "record not found") {
 			return user, err

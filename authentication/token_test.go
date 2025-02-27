@@ -42,10 +42,14 @@ func TestToken(t *testing.T) {
 }
 
 var baseUrl = "https://test-xs-api.memolabs.net/v1"
-var globalPrivateKey = "593b0434faac6e71a8d55545a56653d3f0cbe309b174735ec09d7a4ac05ff75f"
 
 func TestLogin(t *testing.T) {
-	privateKey, err := crypto.HexToECDSA(globalPrivateKey)
+	// privateKey, err := crypto.HexToECDSA(globalPrivateKey)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+
+	privateKey, err := crypto.GenerateKey()
 	if err != nil {
 		t.Fatal(err)
 	}
