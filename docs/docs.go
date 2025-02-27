@@ -590,6 +590,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/point/invite": {
+            "post": {
+                "description": "Get the history of the point info by address",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Point"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer YOUR_ACCESS_TOKEN",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "The invite code from other user",
+                        "name": "code",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.UserInfoRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "520": {
+                        "description": "",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/v1/project/list": {
             "get": {
                 "description": "List all projects with Xspace",

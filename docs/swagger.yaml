@@ -521,6 +521,38 @@ paths:
           schema: {}
       tags:
       - User
+  /v1/point/invite:
+    post:
+      consumes:
+      - application/json
+      description: Get the history of the point info by address
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: The invite code from other user
+        in: body
+        name: code
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.UserInfoRes'
+        "400":
+          description: Bad Request
+          schema: {}
+        "520":
+          description: ""
+          schema: {}
+      tags:
+      - Point
   /v1/project/list:
     get:
       consumes:
