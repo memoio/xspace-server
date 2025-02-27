@@ -79,6 +79,8 @@ func TestLogin(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	t.Log(time.Now().Unix())
 }
 
 func challenge(address string) (string, error) {

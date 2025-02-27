@@ -127,11 +127,11 @@ func (c *PointController) FinishAction(address string, actionID int) (database.U
 	}
 
 	action := database.ActionStore{
-		Id:      actionInfo.ID,
-		Name:    actionInfo.Name,
-		Address: address,
-		Point:   actionInfo.Point,
-		Time:    time.Now(),
+		ActionId: actionInfo.ID,
+		Name:     actionInfo.Name,
+		Address:  address,
+		Point:    actionInfo.Point,
+		Time:     time.Now(),
 	}
 
 	return userInfo, action.CreateActionInfo()

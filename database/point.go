@@ -12,11 +12,11 @@ import (
 )
 
 type ActionStore struct {
-	Id      int
-	Name    string
-	Address string
-	Point   int64
-	Time    time.Time
+	ActionId int `gorm:"column:actionid"`
+	Name     string
+	Address  string
+	Point    int64
+	Time     time.Time
 }
 
 func (action *ActionStore) CreateActionInfo() error {
@@ -25,7 +25,7 @@ func (action *ActionStore) CreateActionInfo() error {
 
 func GetActionCount(address string, actionId int) (int64, error) {
 	var count int64
-	err := GlobalDataBase.Model(&ActionStore{}).Where("address = ? AND id = ?", address, actionId).Count(&count).Error
+	err := GlobalDataBase.Model(&ActionStore{}).Where("address = ? AND actionid = ?", address, actionId).Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
