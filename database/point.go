@@ -71,7 +71,7 @@ func ListActionHistoryByID(address string, page, size int, order string, id int)
 			return nil, err
 		}
 	} else {
-		err := GlobalDataBase.Model(&ActionStore{}).Where("address = ? and id = ?", address, id).Order(orderRules).Offset((page - 1) * size).Limit(size).Find(&actions).Error
+		err := GlobalDataBase.Model(&ActionStore{}).Where("address = ? and actionid = ?", address, id).Order(orderRules).Offset((page - 1) * size).Limit(size).Find(&actions).Error
 		if err != nil {
 			return nil, err
 		}
