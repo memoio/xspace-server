@@ -148,7 +148,7 @@ func (c *PointController) checkExpire(address string, actionInfo ActionInfo) err
 			return xerrors.Errorf("%s is one-time action", actionInfo.Name)
 		}
 		if actions[0].Time.Add(actionInfo.ResetTime).After(time.Now()) {
-			return xerrors.Errorf("The last %s time is %s, please try again after %s", actionInfo.Name, actions[0].Time.String, actions[0].Time.Add(actionInfo.ResetTime))
+			return xerrors.Errorf("The last %s time is %s, please try again after %s", actionInfo.Name, actions[0].Time.String(), actions[0].Time.Add(actionInfo.ResetTime).String())
 		}
 	}
 

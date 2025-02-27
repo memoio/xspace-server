@@ -81,11 +81,18 @@ func NewNFTController(contractAddress common.Address, endpoint, sk string, logge
 	}
 	auth.Value = big.NewInt(0) // in wei
 
+	pointController, err := point.NewPointController()
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+
 	return &NFTController{
 		contractAddress: contractAddress,
 		endpoint:        endpoint,
 		transactor:      auth,
 		store:           store,
+		pointController: pointController,
 		logger:          logger,
 	}, nil
 }
@@ -114,7 +121,7 @@ func (c *NFTController) MintTweetNFTTo(ctx context.Context, name string, postTim
 	}
 
 	var dataBuffer = bytes.NewBuffer(data)
-	filename := name + hex.EncodeToString(crypto.Keccak256([]byte(tweet)))
+	filename := name + hex.EncodeToString(crypto.Keccak256(data))
 	return c.mintNFTTo(ctx, TweetNFT, filename, dataBuffer, to)
 }
 
