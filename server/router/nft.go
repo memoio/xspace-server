@@ -141,7 +141,7 @@ func (h *handler) listNFT(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, types.ListNFTRes{nfts})
+	c.JSON(200, types.ListNFTRes{NftInfos: nfts})
 }
 
 // @ Summary TwitterNFTInfo

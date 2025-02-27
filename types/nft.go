@@ -80,5 +80,5 @@ type RankInfo struct {
 }
 
 type RankRes struct {
-	RnakInfo []RankInfo
+	RankInfo []RankInfo
 }

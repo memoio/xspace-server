@@ -8,21 +8,21 @@ import (
 )
 
 var defaultActions = map[int]ActionInfo{
-	1: ActionInfo{
+	1: {
 		ID:          1,
 		Name:        "Sigin",
 		Description: "Log in to xspace and sign in every day",
 		ResetTime:   24 * time.Hour,
 		Point:       5,
 	},
-	2: ActionInfo{
+	2: {
 		ID:          2,
 		Name:        "Charging",
 		Description: "Daily charging",
 		ResetTime:   5 * time.Hour,
 		Point:       3,
 	},
-	3: ActionInfo{
+	3: {
 		ID:          3,
 		Name:        "MintNFT",
 		Description: "Mint tweets into NFT",
@@ -30,14 +30,14 @@ var defaultActions = map[int]ActionInfo{
 		Point:       15,
 	},
 
-	11: ActionInfo{
+	11: {
 		ID:          11,
 		Name:        "Invited",
 		Description: "Invited by other xspace's user",
 		ResetTime:   time.Duration(-1),
 		Point:       50,
 	},
-	12: ActionInfo{
+	12: {
 		ID:          12,
 		Name:        "Invite",
 		Description: "Invited a new user",
@@ -45,21 +45,21 @@ var defaultActions = map[int]ActionInfo{
 		Point:       50,
 	},
 
-	101: ActionInfo{
+	101: {
 		ID:          101,
 		Name:        "FollowTwitter",
 		Description: "Follow MEMO's official account on Twitter",
 		ResetTime:   time.Duration(-1),
 		Point:       10,
 	},
-	102: ActionInfo{
+	102: {
 		ID:          102,
 		Name:        "FollowDiscord",
 		Description: "Follow MEMO's official account on Discord",
 		ResetTime:   time.Duration(-1),
 		Point:       10,
 	},
-	103: ActionInfo{
+	103: {
 		ID:          103,
 		Name:        "FollowTelegram",
 		Description: "Follow MEMO's official account on Telegram",

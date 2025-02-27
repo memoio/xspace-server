@@ -71,7 +71,8 @@ func NewNFTController(contractAddress common.Address, endpoint, sk string, logge
 
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
-		chainID = big.NewInt(985)
+		logger.Error(err)
+		return nil, err
 	}
 
 	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, chainID)
@@ -135,7 +136,6 @@ func (c *NFTController) mintNFTTo(ctx context.Context, ntype NFTType, filename s
 		return 0, xerrors.Errorf("unspported nft type: %s", ntype)
 	}
 
-	//
 	units, err := getStorageUnits(to)
 	if err != nil {
 		return 0, err
@@ -164,25 +164,29 @@ func (c *NFTController) mintNFTTo(ctx context.Context, ntype NFTType, filename s
 
 	tokenId, err := nftIns.Id(&bind.CallOpts{})
 	if err != nil {
+		c.logger.Error(err)
 		return 0, err
 	}
 
+	c.logger.Info(tokenId)
 	tx, err := nftIns.Mint(c.transactor, to, string(ntype)+`\`+info.Cid)
 	if err != nil {
+		c.logger.Error(err)
 		return 0, err
 	}
 
 	err = c.checkTx(tx.Hash(), "mint")
 	if err != nil {
+		c.logger.Error(err)
 		return 0, err
 	}
 
 	nftStore := &database.NFTStore{
-		TokenId:    tokenId.Uint64(),
-		Address:    to.Hex(),
-		Cid:        info.Cid,
-		Type:       string(ntype),
-		CreateTime: time.Now(),
+		TokenId: tokenId.Uint64(),
+		Address: to.Hex(),
+		Cid:     info.Cid,
+		Type:    string(ntype),
+		Time:    time.Now(),
 	}
 	err = nftStore.CreateNFTInfo()
 	if err != nil {
@@ -207,7 +211,6 @@ func (c *NFTController) GetDataNFTContent(ctx context.Context, tokenId uint64) (
 }
 
 func (c *NFTController) GetTweetNFTContent(ctx context.Context, tokenId uint64) (types.TweetNFTInfo, error) {
-	var data []byte
 	var res types.TweetNFTInfo
 
 	nftType, _, r, err := c.getNFTContent(ctx, tokenId)
@@ -219,12 +222,13 @@ func (c *NFTController) GetTweetNFTContent(ctx context.Context, tokenId uint64) 
 		return res, xerrors.Errorf(`got wrong nft type: %s`, nftType)
 	}
 
-	_, err = r.Read(data)
+	var buffer = new(bytes.Buffer)
+	_, err = buffer.ReadFrom(r)
 	if err != nil {
 		return res, err
 	}
 
-	err = json.Unmarshal(data, &res)
+	err = json.Unmarshal(buffer.Bytes(), &res)
 	return res, err
 }
 

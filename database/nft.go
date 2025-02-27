@@ -7,11 +7,11 @@ import (
 )
 
 type NFTStore struct {
-	TokenId    uint64 `gorm:"primarykey;column:tokenid"`
-	Address    string `gorm:"index"`
-	Cid        string
-	Type       string
-	CreateTime time.Time `gorm:"column:create"`
+	TokenId uint64 `gorm:"primarykey;column:tokenid"`
+	Address string `gorm:"index"`
+	Cid     string
+	Type    string
+	Time    time.Time
 }
 
 func (nft *NFTStore) CreateNFTInfo() error {
@@ -30,9 +30,9 @@ func ListNFT(page, size int, address, order string) ([]NFTStore, error) {
 	var orderRules string
 	switch order {
 	case "time_asc":
-		orderRules = "create"
+		orderRules = "time"
 	case "time_desc":
-		orderRules = "create desc"
+		orderRules = "time desc"
 	default:
 		return nil, xerrors.Errorf("not spport order rules: %s", order)
 	}
@@ -50,9 +50,9 @@ func ListNFTByType(page, size int, address, order string, ntype string) ([]NFTSt
 	var orderRules string
 	switch order {
 	case "time_asc":
-		orderRules = "create"
+		orderRules = "time"
 	case "time_desc":
-		orderRules = "create desc"
+		orderRules = "time desc"
 	default:
 		return nil, xerrors.Errorf("not spport order rules: %s", order)
 	}

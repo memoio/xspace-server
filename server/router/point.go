@@ -290,7 +290,7 @@ func (h *handler) invite(c *gin.Context) {
 //	@Router			/v1/project/list [get]
 //	@Failure		500	{object}	error
 func (h *handler) listProjects(c *gin.Context) {
-	c.JSON(200, types.ListProjectsRes{[]types.ProjectInfo{types.ProjectInfo{Name: "Data-Did", ProjectID: 1, Start: time.Now(), End: time.Now().Add(96 * time.Hour)}}})
+	c.JSON(200, types.ListProjectsRes{Projects: []types.ProjectInfo{{Name: "Data-Did", ProjectID: 1, Start: time.Now(), End: time.Now().Add(96 * time.Hour)}}})
 }
 
 // @ Summary Rank
@@ -306,5 +306,5 @@ func (h *handler) listProjects(c *gin.Context) {
 //	@Router			/v1/project/rank [get]
 //	@Failure		500	{object}	error
 func (h *handler) rank(c *gin.Context) {
-	c.JSON(200, types.RankRes{[]types.RankInfo{types.RankInfo{Rank: 1, Address: "0xcFA4816BE86B7b56A5373A36bE5B9c53c0f157f8", Scores: 100000, Points: 10000}}})
+	c.JSON(200, types.RankRes{RankInfo: []types.RankInfo{{Rank: 1, Address: "0xcFA4816BE86B7b56A5373A36bE5B9c53c0f157f8", Scores: 100000, Points: 10000}}})
 }
