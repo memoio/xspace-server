@@ -4,11 +4,11 @@ import (
 	"context"
 	"os"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/gin-gonic/gin"
 	klog "github.com/go-kratos/kratos/v2/log"
 
 	auth "github.com/memoio/xspace-server/authentication"
+	"github.com/memoio/xspace-server/config"
 	"github.com/memoio/xspace-server/contract/nft"
 	"github.com/memoio/xspace-server/point"
 )
@@ -36,11 +36,8 @@ func NewRouter(ctx context.Context, chain string, sk string, r *gin.RouterGroup)
 		return err
 	}
 
-	nftController, err := nft.NewNFTController(
-		common.HexToAddress("0xa75150D716423c069529A3B2908Eb454e0a00Dfc"),
-		"https://devchain.metamemo.one:8501",
-		sk,
-		loggers)
+	endpoint, nftAddr := config.GetContractInfoByChain(chain)
+	nftController, err := nft.NewNFTController(nftAddr, endpoint, sk, loggers)
 	if err != nil {
 		loggers.Error(err)
 		return err
