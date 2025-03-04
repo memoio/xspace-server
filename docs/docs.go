@@ -160,8 +160,8 @@ const docTemplate = `{
                         "description": "Forbidden",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -206,8 +206,8 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -271,8 +271,8 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -321,8 +321,8 @@ const docTemplate = `{
                         "description": "Forbidden",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -396,8 +396,8 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -444,8 +444,8 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -483,8 +483,8 @@ const docTemplate = `{
                         "description": "Forbidden",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -548,8 +548,8 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -583,8 +583,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.PointInfoRes"
                         }
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -631,8 +631,8 @@ const docTemplate = `{
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -779,8 +779,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/types.UserInfoRes"
                         }
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }

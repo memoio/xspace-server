@@ -31,7 +31,7 @@ func LoadNFTModule(r *gin.RouterGroup, h *handler) {
 //	@Success		200				{object}	types.MintRes
 //	@Router			/v1/nft/tweet/mint [post]
 //	@Failure		400	{object}	error
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) mintTweet(c *gin.Context) {
 	address := c.GetString("address")
 
@@ -46,7 +46,7 @@ func (h *handler) mintTweet(c *gin.Context) {
 	tokenId, err := h.nftController.MintTweetNFTTo(h.context, req.Name, req.PostTime, req.Tweet, req.Images, common.HexToAddress(address))
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 	}
 	c.JSON(200, types.MintRes{TokenID: tokenId})
 }
@@ -62,7 +62,7 @@ func (h *handler) mintTweet(c *gin.Context) {
 //	@Success		200				{object}	types.MintRes
 //	@Router			/v1/nft/data/mint [post]
 //	@Failure		400	{object}	error
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) mintData(c *gin.Context) {
 	address := c.GetString("address")
 	file, err := c.FormFile("file")
@@ -82,7 +82,7 @@ func (h *handler) mintData(c *gin.Context) {
 	tokenId, err := h.nftController.MintDataNFTTo(h.context, file.Filename, fr, common.HexToAddress(address))
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
@@ -103,7 +103,7 @@ func (h *handler) mintData(c *gin.Context) {
 //	@Success		200				{object}	types.ListNFTRes
 //	@Router			/v1/nft/list [get]
 //	@Failure		400	{object}	error
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) listNFT(c *gin.Context) {
 	address := c.GetString("address")
 	pageStr := c.Query("page")
@@ -137,7 +137,7 @@ func (h *handler) listNFT(c *gin.Context) {
 	}
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
@@ -156,7 +156,7 @@ func (h *handler) listNFT(c *gin.Context) {
 //	@Router			/v1/nft/tweet/info [get]
 //	@Failure		400	{object}	error
 //	@Failure		403	{object}	error
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) twitterNFTInfo(c *gin.Context) {
 	address := c.GetString("address")
 	tokenIdStr := c.Query("tokenID")
@@ -190,7 +190,7 @@ func (h *handler) twitterNFTInfo(c *gin.Context) {
 	content, err := h.nftController.GetTweetNFTContent(h.context, tokenId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
@@ -209,7 +209,7 @@ func (h *handler) twitterNFTInfo(c *gin.Context) {
 //	@Router			/v1/nft/data/info [get]
 //	@Failure		400	{object}	error
 //	@Failure		403	{object}	error
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) dataNFTInfo(c *gin.Context) {
 	address := c.GetString("address")
 	tokenIdStr := c.Query("tokenID")
@@ -224,7 +224,7 @@ func (h *handler) dataNFTInfo(c *gin.Context) {
 	info, err := database.GetNFTInfo(tokenId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
@@ -243,7 +243,7 @@ func (h *handler) dataNFTInfo(c *gin.Context) {
 	contentInfo, data, err := h.nftController.GetDataNFTContent(h.context, tokenId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 

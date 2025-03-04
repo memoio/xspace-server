@@ -35,14 +35,14 @@ func LoadPointModules(r *gin.RouterGroup, h *handler) {
 //	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
 //	@Success		200				{object}	types.UserInfoRes
 //	@Router			/v1/user/info [get]
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) userInfo(c *gin.Context) {
 	address := c.GetString("address")
 
 	user, err := database.GetUserInfo(address)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
@@ -58,28 +58,28 @@ func (h *handler) userInfo(c *gin.Context) {
 //	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
 //	@Success		200				{object}	types.PointInfoRes
 //	@Router			/v1/point/info [get]
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) pointInfo(c *gin.Context) {
 	address := c.GetString("address")
 
 	user, err := database.GetUserInfo(address)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
 	godataCount, err := database.GetActionCount(address, 3)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
 	chargingCount, err := database.GetActionCount(address, 2)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
@@ -96,14 +96,14 @@ func (h *handler) pointInfo(c *gin.Context) {
 //	@Success		200				{object}	types.UserInfoRes
 //	@Router			/v1/point/charge [post]
 //	@Failure		403	{object}	error
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) charge(c *gin.Context) {
 	address := c.GetString("address")
 
 	user, err := h.pointController.FinishAction(address, 2)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithError(520, err)
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
@@ -163,7 +163,7 @@ func (h *handler) finishAction(c *gin.Context) {
 //	@Success		200				{object}	types.PointHistoryRes
 //	@Router			/v1/point/history [get]
 //	@Failure		400	{object}	error
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) pointHistory(c *gin.Context) {
 	address := c.GetString("address")
 	pageStr := c.Query("page")
@@ -203,7 +203,7 @@ func (h *handler) pointHistory(c *gin.Context) {
 	actions, err := database.ListActionHistoryByID(address, page, size, order, actionId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
@@ -221,7 +221,7 @@ func (h *handler) pointHistory(c *gin.Context) {
 //	@Success		200				{object}	types.UserInfoRes
 //	@Router			/v1/point/invite [post]
 //	@Failure		400	{object}	error
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) invite(c *gin.Context) {
 	address := c.GetString("address")
 
@@ -277,7 +277,7 @@ func (h *handler) invite(c *gin.Context) {
 	err = user.UpdateUserInfo()
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 

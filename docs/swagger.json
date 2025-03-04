@@ -154,8 +154,8 @@
                         "description": "Forbidden",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -200,8 +200,8 @@
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -265,8 +265,8 @@
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -315,8 +315,8 @@
                         "description": "Forbidden",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -390,8 +390,8 @@
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -438,8 +438,8 @@
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -477,8 +477,8 @@
                         "description": "Forbidden",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -542,8 +542,8 @@
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -577,8 +577,8 @@
                             "$ref": "#/definitions/types.PointInfoRes"
                         }
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -625,8 +625,8 @@
                         "description": "Bad Request",
                         "schema": {}
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
@@ -773,8 +773,8 @@
                             "$ref": "#/definitions/types.UserInfoRes"
                         }
                     },
-                    "520": {
-                        "description": "",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {}
                     }
                 }
