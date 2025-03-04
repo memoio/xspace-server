@@ -121,7 +121,7 @@ func (h *handler) charge(c *gin.Context) {
 //	@Success		200				{object}	types.UserInfoRes
 //	@Router			/v1/point/add [post]
 //	@Failure		400	{object}	error
-//	@Failure		520	{object}	error
+//	@Failure		500	{object}	error
 func (h *handler) finishAction(c *gin.Context) {
 	address := c.GetString("address")
 
@@ -142,7 +142,7 @@ func (h *handler) finishAction(c *gin.Context) {
 	user, err := h.pointController.FinishAction(address, req.ActionId)
 	if err != nil {
 		h.logger.Error(err)
-		c.AbortWithStatusJSON(520, err.Error())
+		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
