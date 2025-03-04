@@ -290,8 +290,9 @@ paths:
         in: query
         name: type
         type: string
-      - description: Order rules (date_asc for sorting by creation time from largest
-          to smallest, date_desc for sorting by creation time from smallest to largest)
+      - description: Order rules (date_asc for sorting by creation time from smallest
+          to largest, date_desc for sorting by creation time from largest to smallest,
+          dealut is date_desc)
         in: query
         name: order
         type: string
@@ -478,8 +479,9 @@ paths:
         in: query
         name: actionID
         type: string
-      - description: Order rules (date_asc for sorting by creation time from largest
-          to smallest, date_desc for sorting by creation time from smallest to largest)
+      - description: Order rules (date_asc for sorting by creation time from smallest
+          to largest, date_desc for sorting by creation time from largest to smallest,
+          dealut is date_desc)
         in: query
         name: order
         type: string

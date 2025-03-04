@@ -138,7 +138,7 @@ func (c *PointController) FinishAction(address string, actionID int) (database.U
 }
 
 func (c *PointController) checkExpire(address string, actionInfo ActionInfo) error {
-	actions, err := database.ListActionHistoryByID(address, 1, 5, "date_asc", actionInfo.ID)
+	actions, err := database.ListActionHistoryByID(address, 1, 5, "date_desc", actionInfo.ID)
 	if err != nil {
 		return err
 	}

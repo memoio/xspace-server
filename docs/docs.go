@@ -255,7 +255,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Order rules (date_asc for sorting by creation time from largest to smallest, date_desc for sorting by creation time from smallest to largest)",
+                        "description": "Order rules (date_asc for sorting by creation time from smallest to largest, date_desc for sorting by creation time from largest to smallest, dealut is date_desc)",
                         "name": "order",
                         "in": "query"
                     }
@@ -532,7 +532,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Order rules (date_asc for sorting by creation time from largest to smallest, date_desc for sorting by creation time from smallest to largest)",
+                        "description": "Order rules (date_asc for sorting by creation time from smallest to largest, date_desc for sorting by creation time from largest to smallest, dealut is date_desc)",
                         "name": "order",
                         "in": "query"
                     }

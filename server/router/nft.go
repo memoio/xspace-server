@@ -99,7 +99,7 @@ func (h *handler) mintData(c *gin.Context) {
 //	@Param			page			query		string	true	"Pages"
 //	@Param			size			query		string	true	"The amount of data displayed on each page"
 //	@Param			type			query		string	false	"NFT type (tweet for tweetNFT, data for dataNFT, tweetNFT and dataNFT will be all listed by default)"
-//	@Param			order			query		string	false	"Order rules (date_asc for sorting by creation time from largest to smallest, date_desc for sorting by creation time from smallest to largest)"
+//	@Param			order			query		string	false	"Order rules (date_asc for sorting by creation time from smallest to largest, date_desc for sorting by creation time from largest to smallest, dealut is date_desc)"
 //	@Success		200				{object}	types.ListNFTRes
 //	@Router			/v1/nft/list [get]
 //	@Failure		400	{object}	error
