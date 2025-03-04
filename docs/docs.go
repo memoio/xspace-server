@@ -255,7 +255,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Order rules (date_asc for sorting by creation time from smallest to largest, date_desc for sorting by creation time from largest to smallest)",
+                        "description": "Order rules (date_asc for sorting by creation time from largest to smallest, date_desc for sorting by creation time from smallest to largest)",
                         "name": "order",
                         "in": "query"
                     }
@@ -532,7 +532,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Order rules (date_asc for sorting by creation time from smallest to largest, date_desc for sorting by creation time from largest to smallest)",
+                        "description": "Order rules (date_asc for sorting by creation time from largest to smallest, date_desc for sorting by creation time from smallest to largest)",
                         "name": "order",
                         "in": "query"
                     }
@@ -791,11 +791,11 @@ const docTemplate = `{
         "database.ActionStore": {
             "type": "object",
             "properties": {
+                "actionId": {
+                    "type": "integer"
+                },
                 "address": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -817,7 +817,7 @@ const docTemplate = `{
                 "cid": {
                     "type": "string"
                 },
-                "createTime": {
+                "time": {
                     "type": "string"
                 },
                 "tokenId": {
@@ -926,7 +926,7 @@ const docTemplate = `{
         "types.RankRes": {
             "type": "object",
             "properties": {
-                "rnakInfo": {
+                "rankInfo": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/types.RankInfo"

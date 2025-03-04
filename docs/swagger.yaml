@@ -2,10 +2,10 @@ basePath: /
 definitions:
   database.ActionStore:
     properties:
+      actionId:
+        type: integer
       address:
         type: string
-      id:
-        type: integer
       name:
         type: string
       point:
@@ -19,7 +19,7 @@ definitions:
         type: string
       cid:
         type: string
-      createTime:
+      time:
         type: string
       tokenId:
         type: integer
@@ -89,7 +89,7 @@ definitions:
     type: object
   types.RankRes:
     properties:
-      rnakInfo:
+      rankInfo:
         items:
           $ref: '#/definitions/types.RankInfo'
         type: array
@@ -290,8 +290,8 @@ paths:
         in: query
         name: type
         type: string
-      - description: Order rules (date_asc for sorting by creation time from smallest
-          to largest, date_desc for sorting by creation time from largest to smallest)
+      - description: Order rules (date_asc for sorting by creation time from largest
+          to smallest, date_desc for sorting by creation time from smallest to largest)
         in: query
         name: order
         type: string
@@ -478,8 +478,8 @@ paths:
         in: query
         name: actionID
         type: string
-      - description: Order rules (date_asc for sorting by creation time from smallest
-          to largest, date_desc for sorting by creation time from largest to smallest)
+      - description: Order rules (date_asc for sorting by creation time from largest
+          to smallest, date_desc for sorting by creation time from smallest to largest)
         in: query
         name: order
         type: string
