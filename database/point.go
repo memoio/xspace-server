@@ -37,9 +37,9 @@ func ListActionHistory(address string, page, size int, order string) ([]ActionSt
 	var actions []ActionStore
 	var orderRules string
 	switch order {
-	case "time_asc":
+	case "date_asc":
 		orderRules = "time"
-	case "time_desc":
+	case "date_desc":
 		orderRules = "time desc"
 	default:
 		return nil, xerrors.Errorf("not spport order rules: %s", order)
@@ -58,9 +58,9 @@ func ListActionHistoryByID(address string, page, size int, order string, id int)
 	var orderRules string
 	switch order {
 	case "date_asc":
-		order = "time"
+		orderRules = "time"
 	case "date_desc":
-		order = "time desc"
+		orderRules = "time desc"
 	default:
 		return nil, xerrors.Errorf("not spport order rules: %s", order)
 	}
