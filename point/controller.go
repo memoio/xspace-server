@@ -34,7 +34,7 @@ var defaultActions = map[int]ActionInfo{
 		ID:          11,
 		Name:        "Invited",
 		Description: "Invited by other xspace's user",
-		ResetTime:   time.Duration(-1),
+		ResetTime:   24 * time.Hour,
 		Point:       50,
 	},
 	12: {
@@ -45,26 +45,47 @@ var defaultActions = map[int]ActionInfo{
 		Point:       50,
 	},
 
+	100: {
+		ID:          100,
+		Name:        "DaliyCheckIn",
+		Description: "Visit MEMO's Twitter daily",
+		ResetTime:   24 * time.Hour,
+		Point:       5,
+	},
 	101: {
 		ID:          101,
 		Name:        "FollowTwitter",
 		Description: "Follow MEMO's official account on Twitter",
 		ResetTime:   time.Duration(-1),
-		Point:       10,
+		Point:       50,
 	},
 	102: {
 		ID:          102,
 		Name:        "FollowDiscord",
 		Description: "Follow MEMO's official account on Discord",
 		ResetTime:   time.Duration(-1),
-		Point:       10,
+		Point:       50,
 	},
 	103: {
 		ID:          103,
 		Name:        "FollowTelegram",
 		Description: "Follow MEMO's official account on Telegram",
 		ResetTime:   time.Duration(-1),
-		Point:       10,
+		Point:       50,
+	},
+	104: {
+		ID:          104,
+		Name:        "ShareToTelegram",
+		Description: "Share the invite link to the Telegram group",
+		ResetTime:   24 * time.Hour,
+		Point:       5,
+	},
+	105: {
+		ID:          105,
+		Name:        "ShareToTwitter",
+		Description: "Share the invite link to the Twitter",
+		ResetTime:   24 * time.Hour,
+		Point:       5,
 	},
 }
 

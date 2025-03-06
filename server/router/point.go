@@ -133,9 +133,9 @@ func (h *handler) finishAction(c *gin.Context) {
 		return
 	}
 
-	if req.ActionId < 101 || req.ActionId > 103 {
-		h.logger.Error("This interface only support actionId from 101 to 103")
-		c.AbortWithStatusJSON(400, "This interface only support actionId from 101 to 103")
+	if req.ActionId < 100 || req.ActionId > 105 {
+		h.logger.Error("This interface only support actionId from 100 to 105")
+		c.AbortWithStatusJSON(400, "This interface only support actionId from 100 to 105")
 		return
 	}
 
