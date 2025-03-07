@@ -425,7 +425,7 @@ const docTemplate = `{
                     },
                     {
                         "description": "action id (101 for follow twitter, 102 for follow discord, 103 for follow telegram)",
-                        "name": "tokenId",
+                        "name": "actionId",
                         "in": "body",
                         "required": true,
                         "schema": {

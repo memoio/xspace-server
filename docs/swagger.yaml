@@ -409,7 +409,7 @@ paths:
       - description: action id (101 for follow twitter, 102 for follow discord, 103
           for follow telegram)
         in: body
-        name: tokenId
+        name: actionId
         required: true
         schema:
           type: integer

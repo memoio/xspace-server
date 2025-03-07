@@ -117,7 +117,7 @@ func (h *handler) charge(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
-//	@Param			tokenId			body		int		true	"action id (101 for follow twitter, 102 for follow discord, 103 for follow telegram)"
+//	@Param			actionId		body		int		true	"action id (101 for follow twitter, 102 for follow discord, 103 for follow telegram)"
 //	@Success		200				{object}	types.UserInfoRes
 //	@Router			/v1/point/add [post]
 //	@Failure		400	{object}	error
