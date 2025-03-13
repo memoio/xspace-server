@@ -230,7 +230,14 @@ func (c *NFTController) GetTweetNFTContent(ctx context.Context, tokenId uint64) 
 	}
 
 	err = json.Unmarshal(buffer.Bytes(), &res)
-	return res, err
+	if err != nil {
+		return res, err
+	}
+
+	if res.Link == "" {
+		res.Link = "https://x.com/" + res.Name
+	}
+	return res, nil
 }
 
 func (c *NFTController) getNFTContent(ctx context.Context, tokenId uint64) (NFTType, gateway.ObjectInfo, io.Reader, error) {
