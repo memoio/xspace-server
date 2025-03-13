@@ -12,6 +12,8 @@ type MintTweetReq struct {
 	PostTime int64
 	Tweet    string
 	Images   []string
+	// Type     string `json:"type,omitempty"`
+	Link string `json:"link,omitempty"`
 }
 
 type MintRes struct {
@@ -20,6 +22,7 @@ type MintRes struct {
 
 type ListNFTRes struct {
 	NftInfos []database.NFTStore
+	Length   int
 }
 
 type TweetNFTInfo struct {
@@ -27,6 +30,7 @@ type TweetNFTInfo struct {
 	PostTime int64
 	Tweet    string
 	Images   []string
+	Link     string `json:"link,omitempty"`
 }
 
 type TweetNFTInfoRes TweetNFTInfo
@@ -55,6 +59,7 @@ type PointInfoRes struct {
 
 type PointHistoryRes struct {
 	History []database.ActionStore
+	Length  int
 }
 
 type ProjectInfo struct {
@@ -81,4 +86,5 @@ type RankInfo struct {
 
 type RankRes struct {
 	RankInfo []RankInfo
+	Length   int
 }

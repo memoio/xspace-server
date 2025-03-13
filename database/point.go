@@ -25,12 +25,19 @@ func (action *ActionStore) CreateActionInfo() error {
 
 func GetActionCount(address string, actionId int) (int64, error) {
 	var count int64
-	err := GlobalDataBase.Model(&ActionStore{}).Where("address = ? AND actionid = ?", address, actionId).Count(&count).Error
-	if err != nil {
-		return 0, err
+	if actionId <= 0 {
+		err := GlobalDataBase.Model(&ActionStore{}).Where("address = ?", address).Count(&count).Error
+		if err != nil {
+			return 0, err
+		}
+	} else {
+		err := GlobalDataBase.Model(&ActionStore{}).Where("address = ? AND actionid = ?", address, actionId).Count(&count).Error
+		if err != nil {
+			return 0, err
+		}
 	}
 
-	return count, err
+	return count, nil
 }
 
 func ListActionHistory(address string, page, size int, order string) ([]ActionStore, error) {
@@ -53,7 +60,7 @@ func ListActionHistory(address string, page, size int, order string) ([]ActionSt
 	return actions, nil
 }
 
-func ListActionHistoryByID(address string, page, size int, order string, id int) ([]ActionStore, error) {
+func ListActionHistoryByID(address string, page, size int, order string, id int) ([]ActionStore, int64, error) {
 	var actions []ActionStore
 	var orderRules string
 	switch order {
@@ -62,22 +69,23 @@ func ListActionHistoryByID(address string, page, size int, order string, id int)
 	case "date_desc":
 		orderRules = "time desc"
 	default:
-		return nil, xerrors.Errorf("not spport order rules: %s", order)
+		return nil, 0, xerrors.Errorf("not spport order rules: %s", order)
 	}
 
 	if id == -1 {
 		err := GlobalDataBase.Model(&ActionStore{}).Where("address = ?", address).Order(orderRules).Find(&actions).Error
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 	} else {
 		err := GlobalDataBase.Model(&ActionStore{}).Where("address = ? and actionid = ?", address, id).Order(orderRules).Offset((page - 1) * size).Limit(size).Find(&actions).Error
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 	}
 
-	return actions, nil
+	length, err := GetActionCount(address, id)
+	return actions, length, err
 }
 
 type UserStore struct {

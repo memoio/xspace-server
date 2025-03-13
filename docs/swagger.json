@@ -377,6 +377,22 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "description": "The post/reply operator",
+                        "name": "type",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "The link to the tweet",
+                        "name": "link",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -825,6 +841,9 @@
         "types.ListNFTRes": {
             "type": "object",
             "properties": {
+                "length": {
+                    "type": "integer"
+                },
                 "nftInfos": {
                     "type": "array",
                     "items": {
@@ -860,6 +879,9 @@
                     "items": {
                         "$ref": "#/definitions/database.ActionStore"
                     }
+                },
+                "length": {
+                    "type": "integer"
                 }
             }
         },
@@ -920,6 +942,9 @@
         "types.RankRes": {
             "type": "object",
             "properties": {
+                "length": {
+                    "type": "integer"
+                },
                 "rankInfo": {
                     "type": "array",
                     "items": {
@@ -936,6 +961,9 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "link": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"

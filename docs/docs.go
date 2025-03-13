@@ -383,6 +383,22 @@ const docTemplate = `{
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "description": "The post/reply operator",
+                        "name": "type",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "The link to the tweet",
+                        "name": "link",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -831,6 +847,9 @@ const docTemplate = `{
         "types.ListNFTRes": {
             "type": "object",
             "properties": {
+                "length": {
+                    "type": "integer"
+                },
                 "nftInfos": {
                     "type": "array",
                     "items": {
@@ -866,6 +885,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/database.ActionStore"
                     }
+                },
+                "length": {
+                    "type": "integer"
                 }
             }
         },
@@ -926,6 +948,9 @@ const docTemplate = `{
         "types.RankRes": {
             "type": "object",
             "properties": {
+                "length": {
+                    "type": "integer"
+                },
                 "rankInfo": {
                     "type": "array",
                     "items": {
@@ -942,6 +967,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "link": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"

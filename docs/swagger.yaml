@@ -28,6 +28,8 @@ definitions:
     type: object
   types.ListNFTRes:
     properties:
+      length:
+        type: integer
       nftInfos:
         items:
           $ref: '#/definitions/database.NFTStore'
@@ -51,6 +53,8 @@ definitions:
         items:
           $ref: '#/definitions/database.ActionStore'
         type: array
+      length:
+        type: integer
     type: object
   types.PointInfoRes:
     properties:
@@ -89,6 +93,8 @@ definitions:
     type: object
   types.RankRes:
     properties:
+      length:
+        type: integer
       rankInfo:
         items:
           $ref: '#/definitions/types.RankInfo'
@@ -100,6 +106,8 @@ definitions:
         items:
           type: string
         type: array
+      link:
+        type: string
       name:
         type: string
       postTime:
@@ -378,6 +386,16 @@ paths:
         in: body
         name: images
         required: true
+        schema:
+          type: string
+      - description: The post/reply operator
+        in: body
+        name: type
+        schema:
+          type: string
+      - description: The link to the tweet
+        in: body
+        name: link
         schema:
           type: string
       produces:

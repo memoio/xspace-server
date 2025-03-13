@@ -200,14 +200,14 @@ func (h *handler) pointHistory(c *gin.Context) {
 		return
 	}
 
-	actions, err := database.ListActionHistoryByID(address, page, size, order, actionId)
+	actions, length, err := database.ListActionHistoryByID(address, page, size, order, actionId)
 	if err != nil {
 		h.logger.Error(err)
 		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
-	c.JSON(200, types.PointHistoryRes{History: actions})
+	c.JSON(200, types.PointHistoryRes{History: actions, Length: int(length)})
 }
 
 // @ Summary Invite
@@ -334,38 +334,38 @@ func (h *handler) rank(c *gin.Context) {
 		return
 	}
 
-	res, err := getDIDRank(page, size)
+	res, length, err := getDIDRank(page, size)
 	if err != nil {
 		h.logger.Error(err)
 		c.AbortWithStatusJSON(500, err.Error())
 		return
 	}
 
-	c.JSON(200, types.RankRes{RankInfo: res})
+	c.JSON(200, types.RankRes{RankInfo: res, Length: length})
 }
 
-func getDIDRank(page, size int) ([]types.RankInfo, error) {
+func getDIDRank(page, size int) ([]types.RankInfo, int, error) {
 	client := &http.Client{Timeout: time.Minute}
 	var url = "https://apapi.memoscan.org/api/points/rank"
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer res.Body.Close()
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, xerrors.Errorf(string(data))
+		return nil, 0, xerrors.Errorf(string(data))
 	}
 
 	var rankInfo = struct {
@@ -384,13 +384,13 @@ func getDIDRank(page, size int) ([]types.RankInfo, error) {
 
 	err = json.Unmarshal(data, &rankInfo)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	offset := (page - 1) * size
 	for index := 0; index < size; index++ {
 		if offset+index >= len(rankInfo.Data) {
-			return result[:index], nil
+			return result[:index], 0, nil
 		}
 
 		result[index] = types.RankInfo{
@@ -416,7 +416,7 @@ func getDIDRank(page, size int) ([]types.RankInfo, error) {
 	// 	return result[(page-1)*size:], nil
 	// }
 
-	return result, nil
+	return result, len(rankInfo.Data), nil
 }
 
 func getRankPoint(rank int) int64 {

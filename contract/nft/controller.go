@@ -106,16 +106,17 @@ func (c *NFTController) MintDataNFTTo(ctx context.Context, filename string, data
 	return c.mintNFTTo(ctx, DataNFT, filename, data, to)
 }
 
-func (c *NFTController) MintTweetNFT(ctx context.Context, name string, postTime int64, tweet string, images []string) (uint64, error) {
-	return c.MintTweetNFTTo(ctx, name, postTime, tweet, images, c.transactor.From)
+func (c *NFTController) MintTweetNFT(ctx context.Context, name string, postTime int64, tweet string, images []string, link string) (uint64, error) {
+	return c.MintTweetNFTTo(ctx, name, postTime, tweet, images, link, c.transactor.From)
 }
 
-func (c *NFTController) MintTweetNFTTo(ctx context.Context, name string, postTime int64, tweet string, images []string, to common.Address) (uint64, error) {
-	data, err := json.Marshal(map[string]interface{}{
+func (c *NFTController) MintTweetNFTTo(ctx context.Context, name string, postTime int64, tweet string, images []string, link string, to common.Address) (uint64, error) {
+	data, err := json.Marshal(map[string]any{
 		"name":     name,
 		"postTime": postTime,
 		"tweet":    tweet,
 		"images":   images,
+		"link":     link,
 	})
 	if err != nil {
 		return 0, err

@@ -28,6 +28,8 @@ func LoadNFTModule(r *gin.RouterGroup, h *handler) {
 //	@Param			postTime		body		int64	true	"The timestamp when the user posted the tweet"
 //	@Param			tweet			body		string	true	"The text of the tweet(including emoji)"
 //	@Param			images			body		string	true	"The image url of the tweet"
+//	@Param			type			body		string	false	"The post/reply operator"
+//	@Param			link			body		string	false	"The link to the tweet"
 //	@Success		200				{object}	types.MintRes
 //	@Router			/v1/nft/tweet/mint [post]
 //	@Failure		400	{object}	error
@@ -43,7 +45,7 @@ func (h *handler) mintTweet(c *gin.Context) {
 		return
 	}
 
-	tokenId, err := h.nftController.MintTweetNFTTo(h.context, req.Name, req.PostTime, req.Tweet, req.Images, common.HexToAddress(address))
+	tokenId, err := h.nftController.MintTweetNFTTo(h.context, req.Name, req.PostTime, req.Tweet, req.Images, req.Link, common.HexToAddress(address))
 	if err != nil {
 		h.logger.Error(err)
 		c.AbortWithStatusJSON(500, err.Error())
@@ -130,10 +132,11 @@ func (h *handler) listNFT(c *gin.Context) {
 	}
 
 	var nfts []database.NFTStore
+	var length int64
 	if ntype == "" {
-		nfts, err = database.ListNFT(page, size, address, order)
+		nfts, length, err = database.ListNFT(page, size, address, order)
 	} else {
-		nfts, err = database.ListNFTByType(page, size, address, order, ntype)
+		nfts, length, err = database.ListNFTByType(page, size, address, order, ntype)
 	}
 	if err != nil {
 		h.logger.Error(err)
@@ -141,7 +144,7 @@ func (h *handler) listNFT(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, types.ListNFTRes{NftInfos: nfts})
+	c.JSON(200, types.ListNFTRes{NftInfos: nfts, Length: int(length)})
 }
 
 // @ Summary TwitterNFTInfo
