@@ -6,6 +6,8 @@ import (
 	"github.com/memoio/xspace-server/database"
 )
 
+type NFTType string
+
 // NFT types
 type MintTweetReq struct {
 	Name     string

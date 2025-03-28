@@ -126,7 +126,7 @@ func GetUserInfo(address string) (UserStore, error) {
 		return user, user.CreateUserInfo()
 	}
 
-	return user, err
+	return resetUserInfo(user)
 }
 
 func GetUserInfoByCode(code string) (UserStore, error) {
@@ -134,6 +134,19 @@ func GetUserInfoByCode(code string) (UserStore, error) {
 	err := GlobalDataBase.Model(&UserStore{}).Where("invitecode = ?", code).Find(&user).Error
 	if err != nil {
 		return user, err
+	}
+
+	return resetUserInfo(user)
+}
+
+func resetUserInfo(user UserStore) (UserStore, error) {
+	if user.UpdateTime.Add(24 * time.Hour).Before(time.Now()) {
+		user.Space = config.DefaultSpace
+		user.UpdateTime = time.Now()
+		err := user.UpdateUserInfo()
+		if err != nil {
+			return user, err
+		}
 	}
 
 	return user, nil

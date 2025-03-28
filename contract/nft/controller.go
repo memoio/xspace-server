@@ -18,7 +18,6 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	com "github.com/memoio/contractsv2/common"
 	"github.com/memoio/nft-solidity/go-contracts/token"
-	"github.com/memoio/xspace-server/config"
 	"github.com/memoio/xspace-server/database"
 	"github.com/memoio/xspace-server/gateway"
 	"github.com/memoio/xspace-server/point"
@@ -137,12 +136,12 @@ func (c *NFTController) mintNFTTo(ctx context.Context, ntype NFTType, filename s
 		return 0, xerrors.Errorf("unspported nft type: %s", ntype)
 	}
 
-	units, err := getStorageUnits(to)
+	userInfo, err := database.GetUserInfo(to.Hex())
 	if err != nil {
 		return 0, err
 	}
 
-	if units == 0 {
+	if userInfo.Space == 0 {
 		return 0, xerrors.New("The user's current storage units is 0")
 	}
 
@@ -310,23 +309,23 @@ func (c *NFTController) checkTx(txHash common.Hash, name string) error {
 	return nil
 }
 
-func getStorageUnits(address common.Address) (int, error) {
-	userInfo, err := database.GetUserInfo(address.Hex())
-	if err != nil {
-		return 0, err
-	}
+// func getStorageUnits(address common.Address) (int, error) {
+// 	userInfo, err := database.GetUserInfo(address.Hex())
+// 	if err != nil {
+// 		return 0, err
+// 	}
 
-	if userInfo.UpdateTime.Add(24 * time.Hour).Before(time.Now()) {
-		userInfo.Space = config.DefaultSpace
-		userInfo.UpdateTime = time.Now()
-		err = userInfo.UpdateUserInfo()
-		if err != nil {
-			return 0, err
-		}
-	}
+// 	if userInfo.UpdateTime.Add(24 * time.Hour).Before(time.Now()) {
+// 		userInfo.Space = config.DefaultSpace
+// 		userInfo.UpdateTime = time.Now()
+// 		err = userInfo.UpdateUserInfo()
+// 		if err != nil {
+// 			return 0, err
+// 		}
+// 	}
 
-	return userInfo.Space, nil
-}
+// 	return userInfo.Space, nil
+// }
 
 // func finishMint(c *point.PointController, address common.Address) error {
 // 	userInfo, err := database.GetUserInfo(address.Hex())
