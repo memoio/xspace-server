@@ -13,6 +13,10 @@ import (
 	"github.com/memoio/xspace-server/point"
 )
 
+type Router struct {
+	handler *handler
+}
+
 type handler struct {
 	context context.Context
 	logger  *klog.Helper
@@ -22,7 +26,7 @@ type handler struct {
 	pointController *point.PointController
 }
 
-func NewRouter(ctx context.Context, chain string, sk string, r *gin.RouterGroup) error {
+func NewRouter(ctx context.Context, chain string, sk string, r *gin.RouterGroup) (*Router, error) {
 	logger := klog.With(klog.NewStdLogger(os.Stdout),
 		"ts", klog.DefaultTimestamp,
 		"caller", klog.DefaultCaller,
@@ -33,20 +37,20 @@ func NewRouter(ctx context.Context, chain string, sk string, r *gin.RouterGroup)
 	authController, err := auth.NewAuthController(sk)
 	if err != nil {
 		loggers.Error(err)
-		return err
+		return nil, err
 	}
 
 	endpoint, nftAddr := config.GetContractInfoByChain(chain)
 	nftController, err := nft.NewNFTController(nftAddr, endpoint, sk, loggers)
 	if err != nil {
 		loggers.Error(err)
-		return err
+		return nil, err
 	}
 
 	pointController, err := point.NewPointController()
 	if err != nil {
 		loggers.Error(err)
-		return err
+		return nil, err
 	}
 
 	h := &handler{
@@ -61,5 +65,9 @@ func NewRouter(ctx context.Context, chain string, sk string, r *gin.RouterGroup)
 	// LoadReferModule(r.Group("/refer"), h)
 	LoadPointModules(r.Group("/"), h)
 	LoadAuthModule(r.Group("/"), h)
-	return nil
+	return &Router{handler: h}, nil
+}
+
+func (r *Router) Start(ctx context.Context) {
+	r.handler.nftController.Start(ctx)
 }

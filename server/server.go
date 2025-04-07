@@ -11,7 +11,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func NewServer(ctx context.Context, chain, sk, port string) (*http.Server, error) {
+func NewServer(ctx context.Context, chain, sk, port string) (*http.Server, *router.Router, error) {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.MaxMultipartMemory = 8 << 20 // 8 MiB
@@ -23,9 +23,9 @@ func NewServer(ctx context.Context, chain, sk, port string) (*http.Server, error
 		})
 	})
 
-	err := router.NewRouter(ctx, chain, sk, r.Group("/v1"))
+	router, err := router.NewRouter(ctx, chain, sk, r.Group("/v1"))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
@@ -34,5 +34,5 @@ func NewServer(ctx context.Context, chain, sk, port string) (*http.Server, error
 	return &http.Server{
 		Addr:    ":" + port,
 		Handler: r,
-	}, nil
+	}, router, nil
 }

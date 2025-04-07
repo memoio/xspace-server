@@ -173,6 +173,7 @@ func (c *NFTContract) runNFTTask(ctx context.Context) {
 				c.tokenID = c.tokenID + tokenId - task.TokenId
 				c.modifyMutex.Unlock()
 			}
+			c.logger.Infof("mint success, tokenID: %d, cid: %s", task.TokenId, task.Cid)
 		}
 
 		select {

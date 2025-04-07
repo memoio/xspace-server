@@ -56,11 +56,12 @@ var xspaceServerRunCmd = &cli.Command{
 			return err
 		}
 
-		srv, err := server.NewServer(cctx, chain, sk, port)
+		srv, router, err := server.NewServer(cctx, chain, sk, port)
 		if err != nil {
 			log.Fatalf("new store node server: %s\n", err)
 		}
 
+		router.Start(cctx)
 		go func() {
 			if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 				log.Fatalf("listen: %s\n", err)
@@ -74,6 +75,9 @@ var xspaceServerRunCmd = &cli.Command{
 
 		if err := srv.Shutdown(cctx); err != nil {
 			log.Fatal("Server forced to shutdown: ", err)
+		}
+		if err := router.Stop(); err != nil {
+			log.Fatal("Router forced to stop: ", err)
 		}
 
 		log.Println("Server exiting")
