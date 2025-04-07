@@ -18,6 +18,10 @@ type MintTweetReq struct {
 	Link string `json:"link,omitempty"`
 }
 
+type StoreRes struct {
+	Cid string
+}
+
 type MintRes struct {
 	TokenID uint64
 }
@@ -44,6 +48,7 @@ type UserInfoRes struct {
 	Points      int64
 	Referrals   int
 	Space       int
+	Storage     int
 }
 
 // point types

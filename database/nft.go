@@ -9,7 +9,7 @@ import (
 type NFTStore struct {
 	TokenId uint64 `gorm:"primarykey;column:tokenid"`
 	Address string `gorm:"index"`
-	Cid     string
+	Cid     string `gorm:"index"`
 	Type    string
 	Time    time.Time
 }
@@ -21,6 +21,13 @@ func (nft *NFTStore) CreateNFTInfo() error {
 func GetNFTInfo(tokenId uint64) (NFTStore, error) {
 	var result NFTStore
 	err := GlobalDataBase.Model(&NFTStore{}).Where("tokenid = ?", tokenId).Find(&result).Error
+
+	return result, err
+}
+
+func GetNFTInfoByCID(cid string) (NFTStore, error) {
+	var result NFTStore
+	err := GlobalDataBase.Model(&NFTStore{}).Where("cid = ?", cid).Find(&result).Error
 
 	return result, err
 }

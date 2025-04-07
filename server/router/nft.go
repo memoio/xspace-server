@@ -10,11 +10,48 @@ import (
 )
 
 func LoadNFTModule(r *gin.RouterGroup, h *handler) {
+	r.POST("/tweet/store", h.VerifyIdentityHandler, h.storeTweet)
 	r.POST("/tweet/mint", h.VerifyIdentityHandler, h.mintTweet)
 	r.POST("/data/mint", h.VerifyIdentityHandler, h.mintData)
 	r.GET("/list", h.VerifyIdentityHandler, h.listNFT)
 	r.GET("/tweet/info", h.VerifyIdentityHandler, h.twitterNFTInfo)
+	r.GET("/tweet/reply/info", h.VerifyIdentityHandler, h.twitterInfo)
 	r.GET("/data/info", h.VerifyIdentityHandler, h.dataNFTInfo)
+}
+
+// @ Summary StoreTweet
+//
+//	@Description	Store user's tweets to MEFS
+//	@Tags			NFT
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
+//	@Param			name			body		string	true	"User's twtter/x name"
+//	@Param			postTime		body		int64	true	"The timestamp when the user posted the tweet"
+//	@Param			tweet			body		string	true	"The text of the tweet(including emoji)"
+//	@Param			images			body		string	true	"The image url of the tweet"
+//	@Param			link			body		string	false	"The link to the tweet"
+//	@Success		200				{object}	types.MintRes
+//	@Router			/v1/nft/tweet/mint [post]
+//	@Failure		400	{object}	error
+//	@Failure		500	{object}	error
+func (h *handler) storeTweet(c *gin.Context) {
+	address := c.GetString("address")
+
+	var req types.MintTweetReq
+	err := c.BindJSON(&req)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err.Error())
+		return
+	}
+
+	cid, err := h.nftController.StoreTweetTo(h.context, req.Name, req.PostTime, req.Tweet, req.Images, req.Link, common.HexToAddress(address))
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(500, err.Error())
+	}
+	c.JSON(200, types.StoreRes{Cid: cid})
 }
 
 // @ Summary MintTweet
@@ -28,7 +65,6 @@ func LoadNFTModule(r *gin.RouterGroup, h *handler) {
 //	@Param			postTime		body		int64	true	"The timestamp when the user posted the tweet"
 //	@Param			tweet			body		string	true	"The text of the tweet(including emoji)"
 //	@Param			images			body		string	true	"The image url of the tweet"
-//	@Param			type			body		string	false	"The post/reply operator"
 //	@Param			link			body		string	false	"The link to the tweet"
 //	@Success		200				{object}	types.MintRes
 //	@Router			/v1/nft/tweet/mint [post]
@@ -149,7 +185,7 @@ func (h *handler) listNFT(c *gin.Context) {
 
 // @ Summary TwitterNFTInfo
 //
-//	@Description	Get TweetNFT content
+//	@Description	Get Post TweetNFT content
 //	@Tags			NFT
 //	@Accept			json
 //	@Produce		json
@@ -191,6 +227,52 @@ func (h *handler) twitterNFTInfo(c *gin.Context) {
 	}
 
 	content, err := h.nftController.GetTweetNFTContent(h.context, tokenId)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(500, err.Error())
+		return
+	}
+
+	c.JSON(200, content)
+}
+
+// @ Summary TwitterInfo
+//
+//	@Description	Get Reply Tweet content
+//	@Tags			NFT
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string	true	"Bearer YOUR_ACCESS_TOKEN"
+//	@Param			cid				query		string	true	"Tweet Content's cid"
+//	@Success		200				{object}	types.TweetNFTInfoRes
+//	@Router			/v1/nft/tweet/reply/info [get]
+//	@Failure		400	{object}	error
+//	@Failure		403	{object}	error
+//	@Failure		500	{object}	error
+func (h *handler) twitterInfo(c *gin.Context) {
+	address := c.GetString("address")
+	cid := c.Query("cid")
+
+	info, err := database.GetNFTInfoByCID(cid)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err.Error())
+		return
+	}
+
+	if info.Address != address {
+		h.logger.Error("You have no access to the tweet nft")
+		c.AbortWithStatusJSON(403, "You have no access to the tweet nft")
+		return
+	}
+
+	if info.Type != "tweet" {
+		h.logger.Error("This api only support tweet NFT, but got type: " + info.Type)
+		c.AbortWithStatusJSON(403, "This api only support tweet NFT, but got type: "+info.Type)
+		return
+	}
+
+	content, err := h.nftController.GetTweetContent(h.context, cid)
 	if err != nil {
 		h.logger.Error(err)
 		c.AbortWithStatusJSON(500, err.Error())

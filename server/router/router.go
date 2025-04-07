@@ -9,7 +9,7 @@ import (
 
 	auth "github.com/memoio/xspace-server/authentication"
 	"github.com/memoio/xspace-server/config"
-	"github.com/memoio/xspace-server/contract/nft"
+	"github.com/memoio/xspace-server/nft"
 	"github.com/memoio/xspace-server/point"
 )
 

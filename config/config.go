@@ -3,6 +3,7 @@ package config
 import "github.com/ethereum/go-ethereum/common"
 
 const DefaultSpace int = 10
+const DefaultStorage int = 1000
 
 var (
 	DevChain     = "https://devchain.metamemo.one:8501"

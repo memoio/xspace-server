@@ -89,13 +89,15 @@ func ListActionHistoryByID(address string, page, size int, order string, id int)
 }
 
 type UserStore struct {
-	Address     string `gorm:"primarykey"`
-	Points      int64
-	InviteCode  string `gorm:"uniqueIndex,conlum:invitecode"`
-	InvitedCode string
-	Referrals   int
-	Space       int
-	UpdateTime  time.Time `gorm:"conlum:updatetime"`
+	Address           string `gorm:"primarykey"`
+	Points            int64
+	InviteCode        string `gorm:"uniqueIndex,conlum:invitecode"`
+	InvitedCode       string
+	Referrals         int
+	Space             int
+	UpdateTime        time.Time `gorm:"conlum:updatetime"`
+	Storage           int
+	StorageUpdateTime time.Time `gorm:"conlum:storageupdatetime"`
 }
 
 func (user *UserStore) CreateUserInfo() error {
@@ -108,13 +110,15 @@ func (user *UserStore) UpdateUserInfo() error {
 
 func GetUserInfo(address string) (UserStore, error) {
 	var user UserStore = UserStore{
-		Address:     address,
-		Points:      0,
-		InviteCode:  "",
-		InvitedCode: "",
-		Referrals:   0,
-		Space:       config.DefaultSpace,
-		UpdateTime:  time.Now(),
+		Address:           address,
+		Points:            0,
+		InviteCode:        "",
+		InvitedCode:       "",
+		Referrals:         0,
+		Space:             config.DefaultSpace,
+		UpdateTime:        time.Now(),
+		Storage:           config.DefaultStorage,
+		StorageUpdateTime: time.Now(),
 	}
 	err := GlobalDataBase.Model(&UserStore{}).Where("address = ?", address).First(&user).Error
 	if err != nil {
@@ -140,9 +144,20 @@ func GetUserInfoByCode(code string) (UserStore, error) {
 }
 
 func resetUserInfo(user UserStore) (UserStore, error) {
+	var update = false
 	if user.UpdateTime.Add(24 * time.Hour).Before(time.Now()) {
 		user.Space = config.DefaultSpace
 		user.UpdateTime = time.Now()
+		update = true
+	}
+
+	if user.StorageUpdateTime.Add(30 * 24 * time.Hour).Before(time.Now()) {
+		user.Storage = config.DefaultStorage
+		user.StorageUpdateTime = time.Now()
+		update = true
+	}
+
+	if update {
 		err := user.UpdateUserInfo()
 		if err != nil {
 			return user, err

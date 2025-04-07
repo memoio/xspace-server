@@ -46,7 +46,7 @@ func (h *handler) userInfo(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, types.UserInfoRes{Address: user.Address, InviteCode: user.InviteCode, Points: user.Points, Referrals: user.Referrals, Space: user.Space})
+	c.JSON(200, types.UserInfoRes{Address: user.Address, InviteCode: user.InviteCode, Points: user.Points, Referrals: user.Referrals, Space: user.Space, Storage: user.Storage})
 }
 
 // @ Summary UserInfo

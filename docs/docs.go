@@ -280,7 +280,7 @@ const docTemplate = `{
         },
         "/v1/nft/tweet/info": {
             "get": {
-                "description": "Get TweetNFT content",
+                "description": "Get Post TweetNFT content",
                 "consumes": [
                     "application/json"
                 ],
@@ -385,14 +385,6 @@ const docTemplate = `{
                         }
                     },
                     {
-                        "description": "The post/reply operator",
-                        "name": "type",
-                        "in": "body",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "description": "The link to the tweet",
                         "name": "link",
                         "in": "body",
@@ -410,6 +402,56 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/v1/nft/tweet/reply/info": {
+            "get": {
+                "description": "Get Reply Tweet content",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "NFT"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer YOUR_ACCESS_TOKEN",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tweet Content's cid",
+                        "name": "cid",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.TweetNFTInfoRes"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {}
                     },
                     "500": {
@@ -1001,6 +1043,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "space": {
+                    "type": "integer"
+                },
+                "storage": {
                     "type": "integer"
                 }
             }

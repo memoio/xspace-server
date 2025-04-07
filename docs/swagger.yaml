@@ -129,6 +129,8 @@ definitions:
         type: integer
       space:
         type: integer
+      storage:
+        type: integer
     type: object
 host: test-xs-api.memolabs.net
 info:
@@ -323,7 +325,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get TweetNFT content
+      description: Get Post TweetNFT content
       parameters:
       - description: Bearer YOUR_ACCESS_TOKEN
         in: header
@@ -388,11 +390,6 @@ paths:
         required: true
         schema:
           type: string
-      - description: The post/reply operator
-        in: body
-        name: type
-        schema:
-          type: string
       - description: The link to the tweet
         in: body
         name: link
@@ -407,6 +404,40 @@ paths:
             $ref: '#/definitions/types.MintRes'
         "400":
           description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - NFT
+  /v1/nft/tweet/reply/info:
+    get:
+      consumes:
+      - application/json
+      description: Get Reply Tweet content
+      parameters:
+      - description: Bearer YOUR_ACCESS_TOKEN
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Tweet Content's cid
+        in: query
+        name: cid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.TweetNFTInfoRes'
+        "400":
+          description: Bad Request
+          schema: {}
+        "403":
+          description: Forbidden
           schema: {}
         "500":
           description: Internal Server Error

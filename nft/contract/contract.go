@@ -137,6 +137,21 @@ func (c *NFTContract) AddMintNFTTask(ntype types.NFTType, cid string, to common.
 	return c.tokenID, nil
 }
 
+func (c *NFTContract) TokenURI(ctx context.Context, tokenId uint64) (string, error) {
+	client, err := ethclient.DialContext(ctx, c.endpoint)
+	if err != nil {
+		return "", err
+	}
+	defer client.Close()
+
+	nftIns, err := token.NewERC721(c.contractAddress, client)
+	if err != nil {
+		return "", err
+	}
+
+	return nftIns.TokenURI(&bind.CallOpts{}, big.NewInt(int64(tokenId)))
+}
+
 func (c *NFTContract) runNFTTask(ctx context.Context) {
 	for {
 		if len(c.nftTasks) > 0 {

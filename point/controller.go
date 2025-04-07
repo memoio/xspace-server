@@ -29,12 +29,19 @@ var defaultActions = map[int]ActionInfo{
 		ResetTime:   time.Duration(0),
 		Point:       15,
 	},
+	4: {
+		ID:          4,
+		Name:        "StoreData",
+		Description: "Store tweets into MEFS",
+		ResetTime:   time.Duration(0),
+		Point:       15,
+	},
 
 	11: {
 		ID:          11,
 		Name:        "Invited",
 		Description: "Invited by other xspace's user",
-		ResetTime:   24 * time.Hour,
+		ResetTime:   time.Duration(-1),
 		Point:       50,
 	},
 	12: {
@@ -136,10 +143,18 @@ func (c *PointController) FinishAction(address string, actionID int) (database.U
 
 	userInfo.Points += actionInfo.Point
 	if actionID == 3 {
-		if userInfo.Space == 0 {
+		if userInfo.Space == 0 && userInfo.Storage == 0 {
 			return database.UserStore{}, xerrors.New("The user's current storage units is 0")
 		}
 		userInfo.Space -= 1
+		userInfo.Storage -= 1
+	}
+
+	if actionID == 4 {
+		if userInfo.Storage == 0 {
+			return database.UserStore{}, xerrors.New("The user's current storage units is 0")
+		}
+		userInfo.Storage -= 1
 	}
 
 	err = userInfo.UpdateUserInfo()
