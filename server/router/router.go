@@ -71,3 +71,7 @@ func NewRouter(ctx context.Context, chain string, sk string, r *gin.RouterGroup)
 func (r *Router) Start(ctx context.Context) {
 	r.handler.nftController.Start(ctx)
 }
+
+func (r *Router) Stop() error {
+	return r.handler.nftController.Stop()
+}
