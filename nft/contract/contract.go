@@ -178,6 +178,7 @@ func (c *NFTContract) runNFTTask(ctx context.Context) {
 
 		select {
 		case <-ctx.Done():
+			c.done = true
 			return
 		case <-time.After(10 * time.Second):
 		}
