@@ -31,10 +31,10 @@ var defaultActions = map[int]ActionInfo{
 	},
 	4: {
 		ID:          4,
-		Name:        "StoreData",
+		Name:        "StoreTweet",
 		Description: "Store tweets into MEFS",
 		ResetTime:   time.Duration(0),
-		Point:       15,
+		Point:       5,
 	},
 
 	11: {

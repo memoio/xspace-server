@@ -7,9 +7,9 @@ import (
 )
 
 type NFTStore struct {
-	TokenId uint64 `gorm:"primarykey;column:tokenid"`
+	TokenId uint64 `gorm:"index;column:tokenid"`
 	Address string `gorm:"index"`
-	Cid     string `gorm:"index"`
+	Cid     string `gorm:"primarykey"`
 	Type    string
 	Time    time.Time
 }

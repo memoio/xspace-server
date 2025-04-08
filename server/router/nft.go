@@ -32,7 +32,7 @@ func LoadNFTModule(r *gin.RouterGroup, h *handler) {
 //	@Param			images			body		string	true	"The image url of the tweet"
 //	@Param			link			body		string	false	"The link to the tweet"
 //	@Success		200				{object}	types.MintRes
-//	@Router			/v1/nft/tweet/mint [post]
+//	@Router			/v1/nft/tweet/store [post]
 //	@Failure		400	{object}	error
 //	@Failure		500	{object}	error
 func (h *handler) storeTweet(c *gin.Context) {
