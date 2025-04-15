@@ -1,16 +1,12 @@
 package router
 
 import (
-	"encoding/json"
-	"io"
-	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/memoio/xspace-server/database"
+	"github.com/memoio/xspace-server/point"
 	"github.com/memoio/xspace-server/types"
-	"golang.org/x/xerrors"
 )
 
 func LoadPointModules(r *gin.RouterGroup, h *handler) {
@@ -294,7 +290,14 @@ func (h *handler) invite(c *gin.Context) {
 //	@Router			/v1/project/list [get]
 //	@Failure		500	{object}	error
 func (h *handler) listProjects(c *gin.Context) {
-	c.JSON(200, types.ListProjectsRes{Projects: []types.ProjectInfo{{Name: "Data-Did", ProjectID: 1, Start: time.Now(), End: time.Now().Add(96 * time.Hour)}}})
+	projects, err := point.ListProjects()
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(500, err.Error())
+		return
+	}
+
+	c.JSON(200, types.ListProjectsRes{Projects: projects})
 }
 
 // @ Summary Rank
@@ -310,7 +313,7 @@ func (h *handler) listProjects(c *gin.Context) {
 //	@Router			/v1/project/rank [get]
 //	@Failure		500	{object}	error
 func (h *handler) rank(c *gin.Context) {
-	projrctId := c.Query("id")
+	projrctIdStr := c.Query("id")
 	pageStr := c.Query("page")
 	sizeStr := c.Query("size")
 
@@ -328,13 +331,14 @@ func (h *handler) rank(c *gin.Context) {
 		return
 	}
 
-	if projrctId != "1" {
-		h.logger.Errorf("unkonw project id %s", projrctId)
-		c.AbortWithStatusJSON(400, "unkonw project id")
+	projectId, err := strconv.Atoi(projrctIdStr)
+	if err != nil {
+		h.logger.Error(err)
+		c.AbortWithStatusJSON(400, err.Error())
 		return
 	}
 
-	res, length, err := getDIDRank(page, size)
+	res, length, err := point.GetRank(projectId, page, size)
 	if err != nil {
 		h.logger.Error(err)
 		c.AbortWithStatusJSON(500, err.Error())
@@ -344,124 +348,124 @@ func (h *handler) rank(c *gin.Context) {
 	c.JSON(200, types.RankRes{RankInfo: res, Length: length})
 }
 
-func getDIDRank(page, size int) ([]types.RankInfo, int, error) {
-	client := &http.Client{Timeout: time.Minute}
-	var url = "https://apapi.memoscan.org/api/points/rank"
+// func getDIDRank(page, size int) ([]types.RankInfo, int, error) {
+// 	client := &http.Client{Timeout: time.Minute}
+// 	var url = "https://apapi.memoscan.org/api/points/rank"
 
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, 0, err
-	}
+// 	req, err := http.NewRequest("GET", url, nil)
+// 	if err != nil {
+// 		return nil, 0, err
+// 	}
 
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, 0, err
-	}
-	defer res.Body.Close()
+// 	res, err := client.Do(req)
+// 	if err != nil {
+// 		return nil, 0, err
+// 	}
+// 	defer res.Body.Close()
 
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, 0, err
-	}
+// 	data, err := io.ReadAll(res.Body)
+// 	if err != nil {
+// 		return nil, 0, err
+// 	}
 
-	if res.StatusCode != http.StatusOK {
-		return nil, 0, xerrors.Errorf(string(data))
-	}
+// 	if res.StatusCode != http.StatusOK {
+// 		return nil, 0, xerrors.Errorf(string(data))
+// 	}
 
-	var rankInfo = struct {
-		Result int
-		Data   []struct {
-			Uid           string
-			Points        int64
-			NickName      string
-			WalletAddress string
-			Avatar        string
-			Inviter       string
-			InviteCount   int
-		}
-	}{}
-	var result []types.RankInfo = make([]types.RankInfo, size)
+// 	var rankInfo = struct {
+// 		Result int
+// 		Data   []struct {
+// 			Uid           string
+// 			Points        int64
+// 			NickName      string
+// 			WalletAddress string
+// 			Avatar        string
+// 			Inviter       string
+// 			InviteCount   int
+// 		}
+// 	}{}
+// 	var result []types.RankInfo = make([]types.RankInfo, size)
 
-	err = json.Unmarshal(data, &rankInfo)
-	if err != nil {
-		return nil, 0, err
-	}
+// 	err = json.Unmarshal(data, &rankInfo)
+// 	if err != nil {
+// 		return nil, 0, err
+// 	}
 
-	offset := (page - 1) * size
-	for index := 0; index < size; index++ {
-		if offset+index >= len(rankInfo.Data) {
-			return result[:index], 0, nil
-		}
+// 	offset := (page - 1) * size
+// 	for index := 0; index < size; index++ {
+// 		if offset+index >= len(rankInfo.Data) {
+// 			return result[:index], 0, nil
+// 		}
 
-		result[index] = types.RankInfo{
-			Rank:    offset + index + 1,
-			Address: rankInfo.Data[offset+index].WalletAddress,
-			Scores:  rankInfo.Data[offset+index].Points,
-			Points:  getRankPoint(offset + index + 1),
-		}
-	}
+// 		result[index] = types.RankInfo{
+// 			Rank:    offset + index + 1,
+// 			Address: rankInfo.Data[offset+index].WalletAddress,
+// 			Scores:  rankInfo.Data[offset+index].Points,
+// 			Points:  getRankPoint(offset + index + 1),
+// 		}
+// 	}
 
-	// for index, rank := range rankInfo.Data {
-	// 	result[index] = types.RankInfo{
-	// 		Rank:    index + 1,
-	// 		Address: rank.WalletAddress,
-	// 		Scores:  rank.Points,
-	// 		Points:  getRankPoint(index + 1),
-	// 	}
-	// }
+// 	// for index, rank := range rankInfo.Data {
+// 	// 	result[index] = types.RankInfo{
+// 	// 		Rank:    index + 1,
+// 	// 		Address: rank.WalletAddress,
+// 	// 		Scores:  rank.Points,
+// 	// 		Points:  getRankPoint(index + 1),
+// 	// 	}
+// 	// }
 
-	// if (page-1)*size >= len(result) {
-	// 	return nil, nil
-	// } else if page*size >= len(result) {
-	// 	return result[(page-1)*size:], nil
-	// }
+// 	// if (page-1)*size >= len(result) {
+// 	// 	return nil, nil
+// 	// } else if page*size >= len(result) {
+// 	// 	return result[(page-1)*size:], nil
+// 	// }
 
-	return result, len(rankInfo.Data), nil
-}
+// 	return result, len(rankInfo.Data), nil
+// }
 
-func getRankPoint(rank int) int64 {
-	if rank <= 0 {
-		return 0
-	}
+// func getRankPoint(rank int) int64 {
+// 	if rank <= 0 {
+// 		return 0
+// 	}
 
-	switch rank {
-	case 1:
-		return 10000
-	case 2:
-		return 8000
-	case 3:
-		return 6000
-	case 4:
-		return 5000
-	case 5:
-		return 4000
-	case 6:
-		return 3800
-	case 7:
-		return 3600
-	case 8:
-		return 3400
-	case 9:
-		return 3200
-	case 10:
-		return 3000
-	}
+// 	switch rank {
+// 	case 1:
+// 		return 10000
+// 	case 2:
+// 		return 8000
+// 	case 3:
+// 		return 6000
+// 	case 4:
+// 		return 5000
+// 	case 5:
+// 		return 4000
+// 	case 6:
+// 		return 3800
+// 	case 7:
+// 		return 3600
+// 	case 8:
+// 		return 3400
+// 	case 9:
+// 		return 3200
+// 	case 10:
+// 		return 3000
+// 	}
 
-	if rank <= 20 {
-		return 2000
-	} else if rank <= 50 {
-		return 1000
-	} else if rank <= 100 {
-		return 800
-	} else if rank <= 200 {
-		return 400
-	} else if rank <= 300 {
-		return 200
-	} else if rank <= 500 {
-		return 100
-	} else if rank <= 1000 {
-		return 60
-	}
+// 	if rank <= 20 {
+// 		return 2000
+// 	} else if rank <= 50 {
+// 		return 1000
+// 	} else if rank <= 100 {
+// 		return 800
+// 	} else if rank <= 200 {
+// 		return 400
+// 	} else if rank <= 300 {
+// 		return 200
+// 	} else if rank <= 500 {
+// 		return 100
+// 	} else if rank <= 1000 {
+// 		return 60
+// 	}
 
-	return 0
-}
+// 	return 0
+// }
